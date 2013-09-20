@@ -14,6 +14,7 @@ namespace blqw
 
         static Dictionary<Type, Literacy> _Items = new Dictionary<Type, Literacy>(255);
         static Dictionary<Type, Literacy> _IgnoreCaseItems = new Dictionary<Type, Literacy>(255);
+        static Dictionary<MethodInfo, LiteracyCaller> _Callers = new Dictionary<MethodInfo, LiteracyCaller>(255);
         /// <summary> 获取缓存
         /// </summary>
         /// <param name="type">反射对象类型</param>
@@ -42,6 +43,32 @@ namespace blqw
                 }
             }
             return lit;
+        }
+
+        /// <summary> 获取缓存
+        /// </summary>
+        /// <param name="type">反射对象类型</param>
+        /// <param name="ignoreCase">属性/字段名称是否忽略大小写</param>
+        /// <returns></returns>
+        public static LiteracyCaller Cache(MethodInfo method)
+        {
+            LiteracyCaller caller;
+            if (_Callers.TryGetValue(method, out caller))
+            {
+                return caller;
+            }
+            else
+            {
+                lock (_Callers)
+                {
+                    if (_Callers.TryGetValue(method, out caller) == false)
+                    {
+                        caller = Literacy.CreateCaller(method);
+                        _Callers.Add(method, caller);
+                    }
+                }
+            }
+            return caller;
         }
 
         #endregion
