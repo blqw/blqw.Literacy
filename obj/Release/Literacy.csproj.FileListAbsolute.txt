@@ -1,0 +1,3 @@
+U:\百度云同步盘\Code\Literacy\Literacy\bin\Release\blqw.Literacy.XML
+U:\百度云同步盘\Code\Literacy\Literacy\bin\Release\blqw.Literacy.dll
+U:\百度云同步盘\Code\Literacy\Literacy\obj\Release\blqw.Literacy.dll
