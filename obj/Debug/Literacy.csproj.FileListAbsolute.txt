@@ -1,8 +1,0 @@
-U:\百度云同步盘\Code\Literacy\Literacy\bin\Debug\blqw.Literacy.dll
-U:\百度云同步盘\Code\Literacy\Literacy\bin\Debug\blqw.Literacy.pdb
-U:\百度云同步盘\Code\Literacy\Literacy\obj\Debug\blqw.Literacy.dll
-U:\百度云同步盘\Code\Literacy\Literacy\obj\Debug\blqw.Literacy.pdb
-U:\百度云同步盘\Code\blqw\Literacy\bin\Debug\blqw.Literacy.dll
-U:\百度云同步盘\Code\blqw\Literacy\bin\Debug\blqw.Literacy.pdb
-U:\百度云同步盘\Code\blqw\Literacy\obj\Debug\blqw.Literacy.dll
-U:\百度云同步盘\Code\blqw\Literacy\obj\Debug\blqw.Literacy.pdb
