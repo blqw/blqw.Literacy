@@ -77,6 +77,12 @@ namespace blqw
         }
 
         #region 只读属性
+        /// <summary> 属性/字段成员元数据
+        /// </summary>
+        public MemberInfo MemberInfo
+        {
+            get { return _Member; }
+        }
         /// <summary> 是否为可空值类型
         /// </summary>
         public bool Nullable { get; private set; }
