@@ -117,7 +117,7 @@ namespace blqw
         /// <summary> 初始化对象属性,字段访问组件,ignoreCase参数指示是否需要区分大小写
         /// </summary>
         /// <param name="type">需快速访问的类型</param>
-        /// <param name="ignoreCase">是否区分大小写(不区分大小写时应保证类中没有同名的(仅大小写不同的)属性或字段)</param>
+        /// <param name="ignoreCase">是否忽略大小写(不区分大小写时应保证类中没有同名的(仅大小写不同的)属性或字段)</param>
         public Literacy(Type type, bool ignoreCase)
         {
             _Type = type;
