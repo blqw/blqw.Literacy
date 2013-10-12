@@ -474,6 +474,7 @@ namespace blqw
             il.Emit(OpCodes.Ret);
             return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
         }
+      
         /// <summary> IL构造一个用于执行方法的委托
         /// </summary>
         /// <param name="method">方法</param>
@@ -484,58 +485,47 @@ namespace blqw
 
             var il = dm.GetILGenerator();
 
-            var isRef = false;
+            var existRef = false;//
 
-            var ps = method.GetParameters();
-            LocalBuilder[] loc = new LocalBuilder[ps.Length];
-            for (int i = 0; i < ps.Length; i++)
+            var parameters = method.GetParameters();
+            LocalBuilder[] loc = new LocalBuilder[parameters.Length];
+            foreach (var p in parameters)
             {
-                var p = ps[i];
                 Type pt = p.ParameterType;
                 if (pt.Name[pt.Name.Length - 1] == '&')//ref,out获取他的实际类型
                 {
-                    isRef = true;
+                    existRef = true;
                     pt = Type.GetType(pt.FullName.Remove(pt.FullName.Length - 1));
                 }
-
-                loc[i] = il.DeclareLocal(pt);
-                if (p.IsOut)
-                {
-                    //if (pt.IsValueType)
-                    //{
-                    //    il.Emit(OpCodes.Initobj, pt);
-                    //}
-                    //else
-                    //{
-                    //    il.Emit(OpCodes.Ldnull);
-                    //}
-                }
-                else
+                loc[p.Position] = il.DeclareLocal(pt);
+                if (p.IsOut == false)               //非out参数 对其赋值
                 {
                     il.Emit(OpCodes.Ldarg_1);
-                    il.Emit(OpCodes.Ldc_I4, i);
+                    il.Emit(OpCodes.Ldc_I4, p.Position);
                     il.Emit(OpCodes.Ldelem_Ref);
                     EmitCast(il, pt);
-                    il.Emit(OpCodes.Stloc, loc[i]);//保存到本地变量
+                    il.Emit(OpCodes.Stloc, loc[p.Position]);//保存到本地变量
                 }
             }
 
-            if (method.IsStatic == false)
+            if (method.IsStatic == false)   //非静态发方法,加上实例
             {
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Castclass, method.DeclaringType);
             }
+
             //将参数加载到参数堆栈
-            foreach (var pa in method.GetParameters())
+            foreach (var p in parameters)
             {
-                if (pa.IsOut || pa.ToString().Contains("&"))//out或ref
+                Type pt = p.ParameterType;
+                if (p.IsOut || pt.Name[pt.Name.Length - 1] == '&')//out或ref
                 {
-                    il.Emit(OpCodes.Ldloca_S, loc[pa.Position]);
+                    il.Emit(OpCodes.Ldloca_S, loc[p.Position]);
                 }
                 else
                 {
-                    il.Emit(OpCodes.Ldloc, loc[pa.Position]);
-                    loc[pa.Position] = null;
+                    il.Emit(OpCodes.Ldloc, loc[p.Position]);
+                    loc[p.Position] = null;
                 }
             }
             LocalBuilder ret = null;
@@ -553,20 +543,22 @@ namespace blqw
                 il.Emit(OpCodes.Callvirt, method);
             }
 
-            //设置参数
-            if (isRef)
+            //设置ref out参数
+            if (existRef) 
             {
-                if (ret != null)
+                if (ret != null)    //如果有返回值,先保存返回值
                 {
                     il.Emit(OpCodes.Starg, ret);
                 }
+
                 for (int i = 0; i < loc.Length; i++)
                 {
                     var l = loc[i];
-                    if (l != null)
+                    var p = parameters[i];
+                    if (l != null && (p.IsOut || p.Name[p.Name.Length - 1] == '&'))
                     {
                         il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Ldelem_I4, i);
+                        il.Emit(OpCodes.Ldc_I4, i);
                         il.Emit(OpCodes.Ldloc, l);
                         if (l.LocalType.IsValueType)
                         {
@@ -579,30 +571,31 @@ namespace blqw
                         il.Emit(OpCodes.Stelem_Ref);
                     }
                 }
-                if (ret != null)
+                if (ret != null)    //如果有返回值,将返回值推送到堆栈上
                 {
                     il.Emit(OpCodes.Ldarg, ret);
                 }
             }
 
 
-            if (ret == null)
+            if (ret == null)    //如果没有返回值,返回null
             {
                 il.Emit(OpCodes.Ldnull);
             }
-            else if (method.ReturnType.IsValueType)
+            else if (method.ReturnType.IsValueType) //如果返回值是值类型,装箱
             {
                 il.Emit(OpCodes.Box, method.ReturnType);
             }
             else
             {
-                il.Emit(OpCodes.Castclass, typeof(object));
+                il.Emit(OpCodes.Castclass, Type_Object);//强转
             }
 
-            il.Emit(OpCodes.Ret);
+            il.Emit(OpCodes.Ret);   //方法结束
 
             return (LiteracyCaller)dm.CreateDelegate(typeof(LiteracyCaller));
         }
+
         /// <summary> IL类型转换指令
         /// </summary>
         private static void EmitCast(ILGenerator il, Type type)
