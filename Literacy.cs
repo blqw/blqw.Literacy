@@ -475,65 +475,42 @@ namespace blqw
             return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
         }
       
-        /// <summary> IL构造一个用于执行方法的委托
+                /// <summary> IL构造一个用于执行方法的委托
         /// </summary>
         /// <param name="method">方法</param>
         /// <returns></returns>
         public static LiteracyCaller CreateCaller(MethodInfo method)
         {
             var dm = new DynamicMethod("", Type_Object, Types_Object_Objects, method.DeclaringType);
-
             var il = dm.GetILGenerator();
-
-            var existRef = false;//
-
             var parameters = method.GetParameters();
-            LocalBuilder[] loc = new LocalBuilder[parameters.Length];
+            Dictionary<int, LocalBuilder> refloc = new Dictionary<int, LocalBuilder>();
             foreach (var p in parameters)
             {
                 Type pt = p.ParameterType;
+                LocalBuilder loc = null;
                 if (pt.Name[pt.Name.Length - 1] == '&')//ref,out获取他的实际类型
                 {
-                    existRef = true;
                     pt = Type.GetType(pt.FullName.Remove(pt.FullName.Length - 1));
+                    loc = il.DeclareLocal(pt);
                 }
-                loc[p.Position] = il.DeclareLocal(pt);
-                if (p.IsOut == false)               //非out参数 对其赋值
+                if (p.IsOut == false)
                 {
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldc_I4, p.Position);
                     il.Emit(OpCodes.Ldelem_Ref);
-                    EmitCast(il, pt);
-                    il.Emit(OpCodes.Stloc, loc[p.Position]);//保存到本地变量
+                    il.Emit(pt.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, pt);
+                    if (loc != null)
+                    {
+                        il.Emit(OpCodes.Stloc, loc);//保存到本地变量
+                    }
                 }
-            }
-
-            if (method.IsStatic == false)   //非静态发方法,加上实例
-            {
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Castclass, method.DeclaringType);
-            }
-
-            //将参数加载到参数堆栈
-            foreach (var p in parameters)
-            {
-                Type pt = p.ParameterType;
-                if (p.IsOut || pt.Name[pt.Name.Length - 1] == '&')//out或ref
+                if (loc != null)
                 {
-                    il.Emit(OpCodes.Ldloca_S, loc[p.Position]);
-                }
-                else
-                {
-                    il.Emit(OpCodes.Ldloc, loc[p.Position]);
-                    loc[p.Position] = null;
+                    il.Emit(OpCodes.Ldloca_S, loc);
+                    refloc.Add(p.Position, loc);
                 }
             }
-            LocalBuilder ret = null;
-            if (method.ReturnType != typeof(void))
-            {
-                ret = il.DeclareLocal(method.ReturnType);
-            }
-
             if (method.IsStatic)
             {
                 il.Emit(OpCodes.Call, method);
@@ -542,71 +519,39 @@ namespace blqw
             {
                 il.Emit(OpCodes.Callvirt, method);
             }
-
-            //设置ref out参数
-            if (existRef) 
+            foreach (var item in refloc)
             {
-                if (ret != null)    //如果有返回值,先保存返回值
-                {
-                    il.Emit(OpCodes.Starg, ret);
-                }
-
-                for (int i = 0; i < loc.Length; i++)
-                {
-                    var l = loc[i];
-                    var p = parameters[i];
-                    if (l != null && (p.IsOut || p.Name[p.Name.Length - 1] == '&'))
-                    {
-                        il.Emit(OpCodes.Ldarg_1);
-                        il.Emit(OpCodes.Ldc_I4, i);
-                        il.Emit(OpCodes.Ldloc, l);
-                        if (l.LocalType.IsValueType)
-                        {
-                            il.Emit(OpCodes.Box, l.LocalType);
-                        }
-                        else
-                        {
-                            il.Emit(OpCodes.Castclass, Type_Object);
-                        }
-                        il.Emit(OpCodes.Stelem_Ref);
-                    }
-                }
-                if (ret != null)    //如果有返回值,将返回值推送到堆栈上
-                {
-                    il.Emit(OpCodes.Ldarg, ret);
-                }
+                var p = parameters[item.Key];
+                var l = item.Value;
+                il.Emit(OpCodes.Ldarg_1);
+                il.Emit(OpCodes.Ldc_I4, item.Key);
+                il.Emit(OpCodes.Ldloc, l);
+                CastToObject(il, l.LocalType);
+                il.Emit(OpCodes.Stelem_Ref);
             }
-
-
-            if (ret == null)    //如果没有返回值,返回null
+            if (method.ReturnType == typeof(void))  //如果没有返回值,返回null
             {
                 il.Emit(OpCodes.Ldnull);
             }
-            else if (method.ReturnType.IsValueType) //如果返回值是值类型,装箱
-            {
-                il.Emit(OpCodes.Box, method.ReturnType);
-            }
             else
             {
-                il.Emit(OpCodes.Castclass, Type_Object);//强转
+                CastToObject(il, method.ReturnType);
             }
-
             il.Emit(OpCodes.Ret);   //方法结束
-
             return (LiteracyCaller)dm.CreateDelegate(typeof(LiteracyCaller));
         }
 
-        /// <summary> IL类型转换指令
+        /// <summary> 类型转换指令
         /// </summary>
-        private static void EmitCast(ILGenerator il, Type type)
+        private static void CastToObject(ILGenerator il, Type from)
         {
-            if (type.IsValueType)
+            if (from.IsValueType)
             {
-                il.Emit(OpCodes.Unbox_Any, type);
+                il.Emit(OpCodes.Box, from);
             }
             else
             {
-                il.Emit(OpCodes.Castclass, type);
+                il.Emit(OpCodes.Castclass, Type_Object);
             }
         }
         #endregion
