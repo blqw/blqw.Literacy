@@ -299,7 +299,7 @@ namespace blqw
         /// <returns></returns>
         public static LiteracyNewObject CreateNewObject(Type type, Type[] argTypes = null)
         {
-            var dm = new DynamicMethod("", Type_Object, Types_Objects, type.IsArray ? typeof(Array):type);
+            var dm = new DynamicMethod("", Type_Object, Types_Objects, type.IsArray ? typeof(Array) : type);
 
             if (argTypes == null)
             {
@@ -331,7 +331,7 @@ namespace blqw
                         il.Emit(OpCodes.Ldarg_0);
                         il.Emit(OpCodes.Ldc_I4, i);
                         il.Emit(OpCodes.Ldelem_Ref);
-                        EmitCast(il, argTypes[i]);
+                        CastToType(il, argTypes[i]);
                     }
                     il.Emit(OpCodes.Newobj, ctor);
                     if (type.IsValueType)
@@ -366,7 +366,7 @@ namespace blqw
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
-                EmitCast(il, prop.DeclaringType);
+                CastToType(il, prop.DeclaringType);
                 il.Emit(OpCodes.Callvirt, met);
             }
             if (prop.PropertyType.IsValueType)
@@ -393,7 +393,7 @@ namespace blqw
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
-                EmitCast(il, field.DeclaringType);
+                CastToType(il, field.DeclaringType);
                 il.Emit(OpCodes.Ldfld, field);
             }
             if (field.FieldType.IsValueType)
@@ -426,7 +426,7 @@ namespace blqw
             if (set.IsStatic)
             {
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, prop.PropertyType);
+                CastToType(il, prop.PropertyType);
                 il.Emit(OpCodes.Call, set);
             }
             else
@@ -434,7 +434,7 @@ namespace blqw
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Castclass, prop.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, prop.PropertyType);
+                CastToType(il, prop.PropertyType);
                 il.Emit(OpCodes.Callvirt, set);
 
             }
@@ -460,22 +460,22 @@ namespace blqw
             if (field.IsStatic)
             {
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, field.FieldType);
+                CastToType(il, field.FieldType);
                 il.Emit(OpCodes.Stsfld, field);
             }
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
-                EmitCast(il, field.DeclaringType);
+                CastToType(il, field.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, field.FieldType);
+                CastToType(il, field.FieldType);
                 il.Emit(OpCodes.Stfld, field);
             }
             il.Emit(OpCodes.Ret);
             return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
         }
-      
-                /// <summary> IL构造一个用于执行方法的委托
+
+        /// <summary> IL构造一个用于执行方法的委托
         /// </summary>
         /// <param name="method">方法</param>
         /// <returns></returns>
@@ -499,7 +499,7 @@ namespace blqw
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldc_I4, p.Position);
                     il.Emit(OpCodes.Ldelem_Ref);
-                    il.Emit(pt.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, pt);
+                    CastToType(il, pt);
                     if (loc != null)
                     {
                         il.Emit(OpCodes.Stloc, loc);//保存到本地变量
@@ -554,6 +554,12 @@ namespace blqw
                 il.Emit(OpCodes.Castclass, Type_Object);
             }
         }
+
+        private static void CastToType(ILGenerator il, System.Type type)
+        {
+            il.Emit(type.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, type);
+        }
+
         #endregion
     }
 }
