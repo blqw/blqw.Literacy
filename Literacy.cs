@@ -489,9 +489,9 @@ namespace blqw
             {
                 Type pt = p.ParameterType;
                 LocalBuilder loc = null;
-                if (pt.Name[pt.Name.Length - 1] == '&')//ref,out获取他的实际类型
+                if (pt.IsByRef)         //ref,out获取他的实际类型
                 {
-                    pt = Type.GetType(pt.FullName.Remove(pt.FullName.Length - 1));
+                    pt = pt.GetElementType();
                     loc = il.DeclareLocal(pt);
                 }
                 if (p.IsOut == false)
