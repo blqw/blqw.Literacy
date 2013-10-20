@@ -299,7 +299,7 @@ namespace blqw
         /// <returns></returns>
         public static LiteracyNewObject CreateNewObject(Type type, Type[] argTypes = null)
         {
-            var dm = new DynamicMethod("", Type_Object, Types_Objects, type.IsArray ? typeof(Array) : type);
+            var dm = new DynamicMethod("", Type_Object, Types_Objects,true);
 
             if (argTypes == null)
             {
