@@ -29,7 +29,7 @@ namespace blqw
             if (OriginalType.IsValueType)
             {
                 MemberType = System.Nullable.GetUnderlyingType(OriginalType);
-                Nullable = MemberType == null;
+                Nullable = MemberType != null;
             }
             MemberType = MemberType ?? OriginalType;
             Getter = PreGetter;
@@ -277,6 +277,11 @@ namespace blqw
             {
                 throw new Exception("实例对象不能为null");
             }
+            else if (this.Nullable && (value == null || value is DBNull))
+            {
+                Setter(instance, null);
+                return;
+            }
             if (MemberType.IsInstanceOfType(value) == false)
             {
                 value = Convert.ChangeType(value, MemberType);
@@ -304,6 +309,11 @@ namespace blqw
             else if (MemberType.IsInstanceOfType(value) == false)
             {
                 return false;
+            }
+            else if (this.Nullable && (value == null || value is DBNull))
+            {
+                Setter(instance, null);
+                return true;
             }
             try
             {
