@@ -77,7 +77,7 @@ namespace blqw
         }
 
         #region 只读属性
-        /// <summary> 属性/字段成员元数据
+        /// <summary> 
         /// </summary>
         public MemberInfo MemberInfo
         {
@@ -306,17 +306,18 @@ namespace blqw
             {
                 return false;
             }
-            else if (MemberType.IsInstanceOfType(value) == false)
-            {
-                return false;
-            }
             else if (this.Nullable && (value == null || value is DBNull))
             {
                 Setter(instance, null);
                 return true;
             }
+
             try
             {
+                if (MemberType.IsInstanceOfType(value) == false)
+                {
+                    value = Convert.ChangeType(value, MemberType);
+                }
                 Setter(instance, value);
                 return true;
             }
@@ -325,9 +326,5 @@ namespace blqw
                 return false;
             }
         }
-
-
     }
-
-
 }
