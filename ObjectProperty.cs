@@ -228,9 +228,12 @@ namespace blqw
             {
                 ErrorGetter(null);
             }
-            else if (instance == null && Static == false)
+            else if (instance == null)
             {
-                throw new Exception("实例对象不能为null");
+                if (Static == false)
+                {
+                    throw new Exception("实例对象不能为null");
+                }
             }
             else if (ClassType.IsInstanceOfType(instance) == false)
             {
@@ -249,10 +252,13 @@ namespace blqw
                 value = null;
                 return false;
             }
-            else if (instance == null && Static == false)
+            else if (instance == null)
             {
-                value = null;
-                return false;
+                if (Static == false)
+                {
+                    value = null;
+                    return false;
+                }
             }
             else if (ClassType.IsInstanceOfType(instance) == false)
             {
@@ -273,9 +279,12 @@ namespace blqw
             {
                 ErrorSetter(null, null);
             }
-            else if (instance == null && Static == false)
+            else if (instance == null)
             {
-                throw new Exception("实例对象不能为null");
+                if (Static == false)
+                {
+                    throw new Exception("实例对象不能为null");
+                }
             }
             else if (this.Nullable && (value == null || value is DBNull))
             {
@@ -298,9 +307,12 @@ namespace blqw
             {
                 return false;
             }
-            else if (instance == null && Static == false)
+            else if (instance == null)
             {
-                return false;
+                if (Static == false)
+                {
+                    return false;
+                }
             }
             else if (ClassType.IsInstanceOfType(instance) == false)
             {
