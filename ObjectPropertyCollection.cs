@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace blqw
@@ -7,9 +8,9 @@ namespace blqw
     /// </summary>
     public class ObjectPropertyCollection : IEnumerable<ObjectProperty>
     {
-        /// <summary> 
+        /// <summary> 属性集合
         /// </summary>
-        Dictionary<string, ObjectProperty> Items;
+        private readonly Dictionary<string, ObjectProperty> _Items;
         /// <summary> 对象属性/字段集合
         /// </summary>
         /// <param name="ignoreCase">是否忽略大小写</param>
@@ -18,11 +19,11 @@ namespace blqw
             IgnoreCase = ignoreCase;
             if (ignoreCase)
             {
-                Items = new Dictionary<string, ObjectProperty>(StringComparer.OrdinalIgnoreCase);
+                _Items = new Dictionary<string, ObjectProperty>(StringComparer.OrdinalIgnoreCase);
             }
             else
             {
-                Items = new Dictionary<string, ObjectProperty>();
+                _Items = new Dictionary<string, ObjectProperty>();
             }
         }
         /// <summary> 是否忽略大小写
@@ -33,13 +34,13 @@ namespace blqw
         /// </summary>
         public bool ContainsKey(string name)
         {
-            return Items.ContainsKey(name);
+            return _Items.ContainsKey(name);
         }
         /// <summary> 属性名集合
         /// </summary>
         public ICollection<string> Names
         {
-            get { return Items.Keys; }
+            get { return _Items.Keys; }
         }
         /// <summary> 获取指定名称的属性,如果属性不存在,则返回null
         /// </summary>
@@ -48,42 +49,34 @@ namespace blqw
             get
             {
                 ObjectProperty value;
-                if (Items.TryGetValue(name, out value))
+                if (_Items.TryGetValue(name, out value))
                 {
                     return value;
                 }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
         }
         /// <summary> 属性个数
         /// </summary>
         public int Count
         {
-            get { return Items.Count; }
+            get { return _Items.Count; }
         }
 
         internal void Add(ObjectProperty value)
         {
+            var name = value.Name;
             if (IgnoreCase)
             {
-                if (Items.ContainsKey(value.Name))
+                if (_Items.ContainsKey(name))
                 {
-                    if (Items[value.Name].Name != value.Name)
+                    if (_Items[name].Name != name)
                     {
-                        throw new Exception("在忽略大小写模式下出现仅大小写不同的重复名称");
+                        throw new ArgumentException("属性名称因忽略大小写而重复");
                     }
                 }
             }
-            Items.Add(value.Name, value);
-            //Items[value.Name] = value;
-        }
-
-        internal bool Remove(string name)
-        {
-            return Items.Remove(name);
+            _Items[name] = value;
         }
 
         /// <summary> 支持在属性或字段集合上进行简单迭代。
@@ -91,7 +84,7 @@ namespace blqw
         /// <returns></returns>
         public IEnumerator<ObjectProperty> GetEnumerator()
         {
-            foreach (var item in Items.Values)
+            foreach (var item in _Items.Values)
             {
                 yield return item;
             }
@@ -100,12 +93,11 @@ namespace blqw
         /// </summary>
         /// <param name="canwirte">是否可写</param>
         /// <param name="canread">是否可读</param>
-        /// <returns></returns>
         public IEnumerator<ObjectProperty> GetEnumerator(bool? canwirte, bool? canread)
         {
             if (canwirte == null && canread == null)
             {
-                foreach (var item in Items.Values)
+                foreach (var item in _Items.Values)
                 {
                     yield return item;
                 }
@@ -113,7 +105,7 @@ namespace blqw
             else if (canwirte == null)
             {
                 var b = canread.Value;
-                foreach (var item in Items.Values)
+                foreach (var item in _Items.Values)
                 {
                     if (item.CanRead == b)
                     {
@@ -124,7 +116,7 @@ namespace blqw
             else if (canread == null)
             {
                 var b = canwirte.Value;
-                foreach (var item in Items.Values)
+                foreach (var item in _Items.Values)
                 {
                     if (item.CanWrite == b)
                     {
@@ -136,7 +128,7 @@ namespace blqw
             {
                 var a = canread.Value;
                 var b = canwirte.Value;
-                foreach (var item in Items.Values)
+                foreach (var item in _Items.Values)
                 {
                     if (item.CanWrite == b && item.CanRead == a)
                     {
@@ -146,9 +138,9 @@ namespace blqw
             }
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return Items.Values.GetEnumerator();
+            return _Items.Values.GetEnumerator();
         }
     }
 }
