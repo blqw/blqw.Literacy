@@ -363,7 +363,7 @@ namespace blqw
             }
             if (type.IsValueType)
             {
-                var dm = new DynamicMethod("", TypeObject, TypesObjects, type.IsArray ? typeof (Array) : type);
+                var dm = new DynamicMethod("", TypeObject, TypesObjects, true);
                 var il = dm.GetILGenerator();
                 il.Emit(OpCodes.Ldloca_S, il.DeclareLocal(type));
                 il.Emit(OpCodes.Initobj, type);
@@ -396,7 +396,7 @@ namespace blqw
                 return null;
             }
             Type type = ctor.DeclaringType;
-            var dm = new DynamicMethod("", TypeObject, TypesObjects, type.IsArray ? typeof (Array) : type);
+            var dm = new DynamicMethod("", TypeObject, TypesObjects, true);
             var ps = ctor.GetParameters();
             var il = dm.GetILGenerator();
 
@@ -438,7 +438,7 @@ namespace blqw
             {
                 return null;
             }
-            var dm = new DynamicMethod("", TypeObject, TypesObject, prop.DeclaringType);
+            var dm = new DynamicMethod("", TypeObject, TypesObject, true);
             var il = dm.GetILGenerator();
             var met = prop.GetGetMethod(true);
             if (met == null)
@@ -471,7 +471,7 @@ namespace blqw
             {
                 return null;
             }
-            var dm = new DynamicMethod("", TypeObject, TypesObject, field.DeclaringType);
+            var dm = new DynamicMethod("", TypeObject, TypesObject, true);
             var il = dm.GetILGenerator();
             if (field.IsStatic)
             {
@@ -503,7 +503,7 @@ namespace blqw
             {
                 return null;
             }
-            var dm = new DynamicMethod("", null, Types2Object, prop.DeclaringType);
+            var dm = new DynamicMethod("", null, Types2Object, true);
             var set = prop.GetSetMethod(true);
             if (set == null)
             {
@@ -542,7 +542,7 @@ namespace blqw
             {
                 return null;
             }
-            var dm = new DynamicMethod("", null, Types2Object, field.DeclaringType);
+            var dm = new DynamicMethod("", null, Types2Object, true);
             var il = dm.GetILGenerator();
 
             if (field.IsStatic)
@@ -573,7 +573,7 @@ namespace blqw
                 return null;
             }
 
-            var dm = new DynamicMethod("", TypeObject, TypesObjectObjects, method.DeclaringType);
+            var dm = new DynamicMethod("", TypeObject, TypesObjectObjects, true);
 
             var il = dm.GetILGenerator();
 
