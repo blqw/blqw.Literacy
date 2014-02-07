@@ -520,7 +520,7 @@ namespace blqw
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Castclass, prop.DeclaringType);
+                EmitCast(il, prop.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
                 EmitCast(il, prop.PropertyType);
                 il.Emit(OpCodes.Callvirt, set);
@@ -681,9 +681,12 @@ namespace blqw
             if (type.IsValueType)
             {
                 il.Emit(OpCodes.Unbox_Any, type);
-                var t = il.DeclareLocal(type);
-                il.Emit(OpCodes.Stloc, t);
-                il.Emit(OpCodes.Ldloca_S, t);
+                if (Nullable.GetUnderlyingType(type) == null)
+                {
+                    var t = il.DeclareLocal(type);
+                    il.Emit(OpCodes.Stloc, t);
+                    il.Emit(OpCodes.Ldloca_S, t);
+                }
             }
             else
             {
