@@ -92,23 +92,23 @@ namespace blqw
 
         /// <summary> typeof(Object)
         /// </summary>
-        private static readonly Type TypeObject = typeof (Object);
+        private static readonly Type TypeObject = typeof(Object);
 
         /// <summary> [ typeof(Object) ]
         /// </summary>
-        private static readonly Type[] TypesObject = {typeof (Object)};
+        private static readonly Type[] TypesObject = { typeof(Object) };
 
         /// <summary> [ typeof(Object),typeof(Object) ]
         /// </summary>
-        private static readonly Type[] Types2Object = {typeof (Object), typeof (Object)};
+        private static readonly Type[] Types2Object = { typeof(Object), typeof(Object) };
 
         /// <summary> [ typeof(object[]) ]
         /// </summary>
-        private static readonly Type[] TypesObjects = {typeof (object[])};
+        private static readonly Type[] TypesObjects = { typeof(object[]) };
 
         /// <summary> [ typeof(Object), typeof(object[])  ]
         /// </summary>
-        private static readonly Type[] TypesObjectObjects = {typeof (Object), typeof (object[])};
+        private static readonly Type[] TypesObjectObjects = { typeof(Object), typeof(object[]) };
 
         #endregion
 
@@ -153,7 +153,7 @@ namespace blqw
         /// <param name="type">需快速访问的类型</param>
         public Literacy(Type type)
             : this(type, false)
-        {}
+        { }
 
         /// <summary> 初始化对象属性,字段访问组件,ignoreCase参数指示是否需要区分大小写
         /// </summary>
@@ -191,7 +191,7 @@ namespace blqw
         }
 
         #region ILoadMember
-        
+
         /// <summary> 加载标识 
         /// <para>1  公共实例字段</para>
         /// <para>2  非公共实例字段</para>
@@ -324,7 +324,7 @@ namespace blqw
                 }
             }
             Monitor.Exit(this);
-        } 
+        }
         #endregion
 
         /// <summary> 判断是否已加载
@@ -370,7 +370,7 @@ namespace blqw
                 il.Emit(OpCodes.Ldloc_0);
                 il.Emit(OpCodes.Box, type);
                 il.Emit(OpCodes.Ret);
-                return (LiteracyNewObject) dm.CreateDelegate(typeof (LiteracyNewObject));
+                return (LiteracyNewObject)dm.CreateDelegate(typeof(LiteracyNewObject));
             }
             if (argTypes == null)
             {
@@ -427,7 +427,7 @@ namespace blqw
                 }
             }
             il.Emit(OpCodes.Ret);
-            return (LiteracyNewObject) dm.CreateDelegate(typeof (LiteracyNewObject));
+            return (LiteracyNewObject)dm.CreateDelegate(typeof(LiteracyNewObject));
         }
 
         /// <summary> IL构造一个用于获取对象属性值的委托
@@ -460,7 +460,7 @@ namespace blqw
                 il.Emit(OpCodes.Box, prop.PropertyType);
             }
             il.Emit(OpCodes.Ret);
-            return (LiteracyGetter) dm.CreateDelegate(typeof (LiteracyGetter));
+            return (LiteracyGetter)dm.CreateDelegate(typeof(LiteracyGetter));
         }
 
         /// <summary> IL构造一个用于获取对象字段值的委托
@@ -488,7 +488,7 @@ namespace blqw
                 il.Emit(OpCodes.Box, field.FieldType);
             }
             il.Emit(OpCodes.Ret);
-            return (LiteracyGetter) dm.CreateDelegate(typeof (LiteracyGetter));
+            return (LiteracyGetter)dm.CreateDelegate(typeof(LiteracyGetter));
         }
 
         /// <summary> IL构造一个用于设置对象属性值的委托
@@ -520,14 +520,21 @@ namespace blqw
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
-                EmitCast(il, prop.DeclaringType);
+                il.Emit(OpCodes.Castclass, prop.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, prop.PropertyType);
+                if (prop.PropertyType.IsValueType)
+                {
+                    il.Emit(OpCodes.Unbox_Any, prop.PropertyType);
+                }
+                else
+                {
+                    il.Emit(OpCodes.Castclass, prop.PropertyType);
+                }
                 il.Emit(OpCodes.Callvirt, set);
             }
             il.Emit(OpCodes.Ret);
 
-            return (LiteracySetter) dm.CreateDelegate(typeof (LiteracySetter));
+            return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
         }
 
         /// <summary> IL构造一个用于设置对象字段值的委托
@@ -556,11 +563,18 @@ namespace blqw
                 il.Emit(OpCodes.Ldarg_0);
                 EmitCast(il, field.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, field.FieldType);
+                if (field.FieldType.IsValueType)
+                {
+                    il.Emit(OpCodes.Unbox_Any, field.FieldType);
+                }
+                else
+                {
+                    il.Emit(OpCodes.Castclass, field.FieldType);
+                }
                 il.Emit(OpCodes.Stfld, field);
             }
             il.Emit(OpCodes.Ret);
-            return (LiteracySetter) dm.CreateDelegate(typeof (LiteracySetter));
+            return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
         }
 
         /// <summary> IL构造一个用于执行方法的委托
@@ -621,7 +635,7 @@ namespace blqw
                 }
             }
             LocalBuilder ret = null;
-            if (method.ReturnType != typeof (void))
+            if (method.ReturnType != typeof(void))
             {
                 ret = il.DeclareLocal(method.ReturnType);
             }
@@ -666,12 +680,12 @@ namespace blqw
             }
             else
             {
-                il.Emit(OpCodes.Castclass, typeof (object));
+                il.Emit(OpCodes.Castclass, typeof(object));
             }
 
             il.Emit(OpCodes.Ret);
 
-            return (LiteracyCaller) dm.CreateDelegate(typeof (LiteracyCaller));
+            return (LiteracyCaller)dm.CreateDelegate(typeof(LiteracyCaller));
         }
 
         /// <summary> IL类型转换指令
