@@ -144,11 +144,11 @@ namespace blqw
                     }
                     else if (Field)
                     {
-                        Getter = Literacy.CreateGetter((FieldInfo) MemberInfo);
+                        Getter = Literacy.CreateGetter((FieldInfo)MemberInfo);
                     }
                     else
                     {
-                        Getter = Literacy.CreateGetter((PropertyInfo) MemberInfo);
+                        Getter = Literacy.CreateGetter((PropertyInfo)MemberInfo);
                     }
                 }
             }
@@ -172,11 +172,11 @@ namespace blqw
                     }
                     else if (Field)
                     {
-                        Setter = Literacy.CreateSetter((FieldInfo) MemberInfo);
+                        Setter = Literacy.CreateSetter((FieldInfo)MemberInfo);
                     }
                     else
                     {
-                        Setter = Literacy.CreateSetter((PropertyInfo) MemberInfo);
+                        Setter = Literacy.CreateSetter((PropertyInfo)MemberInfo);
                     }
                 }
             }
@@ -289,7 +289,7 @@ namespace blqw
                     throw new ArgumentNullException("instance", "实例属性对象不能为null");
                 }
             }
-            else if (Nullable && (value == null || value is DBNull))
+            else if ((OriginalType.IsClass || Nullable) && (value == null || value is DBNull))
             {
                 Setter(instance, null);
                 return;
@@ -322,7 +322,7 @@ namespace blqw
             {
                 return false;
             }
-            else if (Nullable && (value == null || value is DBNull))
+            else if ((OriginalType.IsClass || Nullable) && (value == null || value is DBNull))
             {
                 Setter(instance, null);
                 return true;
