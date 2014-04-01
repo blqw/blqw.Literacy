@@ -611,7 +611,7 @@ namespace blqw
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Ldc_I4, i);
                     il.Emit(OpCodes.Ldelem_Ref);
-                    EmitCast(il, pt);
+                    EmitCast(il, pt, false);
                     il.Emit(OpCodes.Stloc, loc[i]); //保存到本地变量
                 }
             }
@@ -690,12 +690,12 @@ namespace blqw
 
         /// <summary> IL类型转换指令
         /// </summary>
-        private static void EmitCast(ILGenerator il, Type type)
+        private static void EmitCast(ILGenerator il, Type type, bool check = true)
         {
             if (type.IsValueType)
             {
                 il.Emit(OpCodes.Unbox_Any, type);
-                if (Nullable.GetUnderlyingType(type) == null)
+                if (check && Nullable.GetUnderlyingType(type) == null)
                 {
                     var t = il.DeclareLocal(type);
                     il.Emit(OpCodes.Stloc, t);
