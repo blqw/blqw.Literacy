@@ -579,27 +579,28 @@ namespace blqw
             var dm = new DynamicMethod("", null, Types2Object, true);
             var il = dm.GetILGenerator();
 
+            OpCode opst;
             if (field.IsStatic)
             {
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, field.FieldType);
-                il.Emit(OpCodes.Stsfld, field);
+                opst = OpCodes.Stsfld;
             }
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
                 EmitCast(il, field.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                if (field.FieldType.IsValueType)
-                {
-                    il.Emit(OpCodes.Unbox_Any, field.FieldType);
-                }
-                else
-                {
-                    il.Emit(OpCodes.Castclass, field.FieldType);
-                }
-                il.Emit(OpCodes.Stfld, field);
+                opst = OpCodes.Stfld;
             }
+            if (field.FieldType.IsValueType)
+            {
+                il.Emit(OpCodes.Unbox_Any, field.FieldType);
+            }
+            else
+            {
+                il.Emit(OpCodes.Castclass, field.FieldType);
+            }
+            il.Emit(opst, field);
             il.Emit(OpCodes.Ret);
             return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
         }
