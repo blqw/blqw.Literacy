@@ -114,15 +114,27 @@ namespace blqw
 
         /// <summary> 对象类型
         /// </summary>
-        public Type Type { get; private set; }
+        public Type Type
+        {
+            get;
+            private set;
+        }
 
         /// <summary> 对象属性集合
         /// </summary>
-        public ObjectPropertyCollection Property { get; private set; }
+        public ObjectPropertyCollection Property
+        {
+            get;
+            private set;
+        }
 
         /// <summary> 对象字段集合
         /// </summary>
-        public ObjectPropertyCollection Field { get; private set; }
+        public ObjectPropertyCollection Field
+        {
+            get;
+            private set;
+        }
 
         #region 私有的
 
@@ -153,7 +165,8 @@ namespace blqw
         /// <param name="type">需快速访问的类型</param>
         public Literacy(Type type)
             : this(type, false)
-        { }
+        {
+        }
 
         /// <summary> 初始化对象属性,字段访问组件,ignoreCase参数指示是否需要区分大小写
         /// </summary>
@@ -205,7 +218,10 @@ namespace blqw
         /// </summary>
         public ILoadMember Load
         {
-            get { return this; }
+            get
+            {
+                return this;
+            }
         }
 
         #region ILoadMember
@@ -453,7 +469,14 @@ namespace blqw
             {
                 il.Emit(OpCodes.Ldarg_0);
                 EmitCast(il, prop.DeclaringType);
-                il.Emit(OpCodes.Callvirt, met);
+                if (prop.DeclaringType.IsValueType)
+                {
+                    il.Emit(OpCodes.Call, met);
+                }
+                else
+                {
+                    il.Emit(OpCodes.Callvirt, met);
+                }
             }
             if (prop.PropertyType.IsValueType)
             {
@@ -470,6 +493,10 @@ namespace blqw
             if (field == null)
             {
                 return null;
+            }
+            if (field.DeclaringType.IsValueType) //值类型无法通过方法给其属性或字段赋值
+            {
+                throw new NotSupportedException("不支持值类型成员的赋值操作");
             }
             var dm = new DynamicMethod("", TypeObject, TypesObject, true);
             var il = dm.GetILGenerator();
@@ -501,7 +528,7 @@ namespace blqw
             }
             if (prop.DeclaringType.IsValueType) //值类型无法通过方法给其属性或字段赋值
             {
-                return null;
+                throw new NotSupportedException("不支持值类型成员的赋值操作");
             }
             var dm = new DynamicMethod("", null, Types2Object, true);
             var set = prop.GetSetMethod(true);
