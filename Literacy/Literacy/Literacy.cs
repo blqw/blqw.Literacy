@@ -494,10 +494,6 @@ namespace blqw
             {
                 return null;
             }
-            if (field.DeclaringType.IsValueType) //值类型无法通过方法给其属性或字段赋值
-            {
-                throw new NotSupportedException("不支持值类型成员的赋值操作");
-            }
             var dm = new DynamicMethod("", TypeObject, TypesObject, true);
             var il = dm.GetILGenerator();
             if (field.IsStatic)
