@@ -667,7 +667,7 @@ namespace blqw
                 ret = il.DeclareLocal(method.ReturnType);
             }
 
-            if (method.IsStatic)
+            if (method.IsStatic || method.DeclaringType.IsValueType)
             {
                 il.Emit(OpCodes.Call, method);
             }
