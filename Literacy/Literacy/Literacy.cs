@@ -181,7 +181,7 @@ namespace blqw
             Type = type;
             _CallNewObject = PreNewObject;
             Property = new ObjectPropertyCollection(ignoreCase);
-            foreach (var p in type.GetProperties())
+            foreach (var p in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (p.GetIndexParameters().Length == 0) //排除索引器
                 {
