@@ -377,7 +377,7 @@ namespace blqw
             {
                 throw new ArgumentNullException("type");
             }
-            if (type.IsValueType && argTypes == null || argTypes.Length == 0)
+            if (type.IsValueType && (argTypes == null || argTypes.Length == 0))
             {
                 var dm = new DynamicMethod("", TypeObject, TypesObjects, true);
                 var il = dm.GetILGenerator();
