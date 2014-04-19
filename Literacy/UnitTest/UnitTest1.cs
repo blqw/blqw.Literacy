@@ -296,5 +296,34 @@ namespace UnitTest
                 }
             }
         }
+
+
+
+
+        [TestMethod]
+        public void TestCreateClass()
+        {
+            var new1 = blqw.Literacy.CreateNewObject(typeof(ClassEntity), null);
+            var obj1 = (ClassEntity)new1();
+            Assert.AreNotEqual(null, obj1);
+
+            var new2 = blqw.Literacy.CreateNewObject(typeof(ClassEntity), new Type[] { typeof(string), typeof(int) });
+            var obj2 = (ClassEntity)new2("A", 1);
+            Assert.AreEqual("A", obj2.ClassProperty);
+            Assert.AreEqual(1, obj2.StructProperty);
+        }
+
+        [TestMethod]
+        public void TestCreateStruct()
+        {
+            var new1 = blqw.Literacy.CreateNewObject(typeof(StructEntity), null);
+            var obj1 = (StructEntity)new1();
+            Assert.AreNotEqual(null, obj1);
+
+            var new2 = blqw.Literacy.CreateNewObject(typeof(StructEntity), new Type[] { typeof(string), typeof(int) });
+            var obj2 = (StructEntity)new2("A", 1);
+            Assert.AreEqual("A", obj2.ClassProperty);
+            Assert.AreEqual(1, obj2.StructProperty);
+        }
     }
 }

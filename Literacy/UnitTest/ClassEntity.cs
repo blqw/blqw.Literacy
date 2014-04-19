@@ -7,6 +7,17 @@ namespace UnitTest
 {
     public class ClassEntity
     {
+        public ClassEntity()
+        {
+
+        }
+        public ClassEntity(string str,int i)
+        {
+            ClassProperty = str;
+            StructProperty = i;
+        }
+
+
         //公共实例属性
         public string ClassProperty { get; set; }
         public int StructProperty { get; set; }

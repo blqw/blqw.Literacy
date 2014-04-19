@@ -7,6 +7,13 @@ namespace UnitTest
 {
     public struct StructEntity
     {
+        public StructEntity(string str, int i)
+            :this()
+        {
+            ClassProperty = str;
+            StructProperty = i;
+        }
+
         public StructEntity( string privateClassProperty,
                             int privateStructProperty,
                             string privateStaticClassProperty,
