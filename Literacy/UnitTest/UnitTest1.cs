@@ -202,7 +202,7 @@ namespace UnitTest
             value = lit.Field["PrivateStaticStructField"].GetValue(obj);
             Assert.AreEqual(value, 4);
         }
-        //测试引用类型方法调用,参数包含值类型,引用类型, ref 和out,
+        //测试引用类型方法调用
         [TestMethod]
         public void TestClassMethod()
         {
@@ -249,7 +249,7 @@ namespace UnitTest
                 }
             }
         }
-
+        //测试值类型的方法调用
         [TestMethod]
         public void TestStructMethod()
         {
@@ -296,10 +296,7 @@ namespace UnitTest
                 }
             }
         }
-
-
-
-
+        //测试初始化引用类型
         [TestMethod]
         public void TestCreateClass()
         {
@@ -312,7 +309,7 @@ namespace UnitTest
             Assert.AreEqual("A", obj2.ClassProperty);
             Assert.AreEqual(1, obj2.StructProperty);
         }
-
+        //测试初始化值类型
         [TestMethod]
         public void TestCreateStruct()
         {
