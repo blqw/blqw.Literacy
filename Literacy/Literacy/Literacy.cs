@@ -377,7 +377,7 @@ namespace blqw
             {
                 throw new ArgumentNullException("type");
             }
-            if (type.IsValueType)
+            if (type.IsValueType && argTypes == null || argTypes.Length == 0)
             {
                 var dm = new DynamicMethod("", TypeObject, TypesObjects, true);
                 var il = dm.GetILGenerator();
@@ -416,32 +416,19 @@ namespace blqw
             var ps = ctor.GetParameters();
             var il = dm.GetILGenerator();
 
+            for (int i = 0; i < ps.Length; i++)
+            {
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldc_I4, i);
+                il.Emit(OpCodes.Ldelem_Ref);
+                EmitCast(il, ps[i].ParameterType, false);
+            }
+            il.Emit(OpCodes.Newobj, ctor);
             if (type.IsValueType)
             {
-                if (ps.Length > 0)
-                {
-                    throw new NotImplementedException("暂不支持结构的有参构造函数");
-                }
-                il.Emit(OpCodes.Ldloca_S, il.DeclareLocal(type));
-                il.Emit(OpCodes.Initobj, type);
-                il.Emit(OpCodes.Ldloc_0);
                 il.Emit(OpCodes.Box, type);
             }
-            else
-            {
-                for (int i = 0; i < ps.Length; i++)
-                {
-                    il.Emit(OpCodes.Ldarg_0);
-                    il.Emit(OpCodes.Ldc_I4, i);
-                    il.Emit(OpCodes.Ldelem_Ref);
-                    EmitCast(il, ps[i].ParameterType);
-                }
-                il.Emit(OpCodes.Newobj, ctor);
-                if (type.IsValueType)
-                {
-                    il.Emit(OpCodes.Box, type);
-                }
-            }
+
             il.Emit(OpCodes.Ret);
             return (LiteracyNewObject)dm.CreateDelegate(typeof(LiteracyNewObject));
         }
@@ -533,28 +520,21 @@ namespace blqw
                 return null;
             }
             var il = dm.GetILGenerator();
-            OpCode opcall;
+
             if (set.IsStatic)
             {
                 il.Emit(OpCodes.Ldarg_1);
-                opcall = OpCodes.Call;
+                EmitCast(il, prop.PropertyType, false);
+                il.Emit(OpCodes.Call, set);
             }
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Castclass, prop.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                opcall = OpCodes.Callvirt;
+                EmitCast(il, prop.PropertyType, false);
+                il.Emit(OpCodes.Callvirt, set);
             }
-            if (prop.PropertyType.IsValueType)
-            {
-                il.Emit(OpCodes.Unbox_Any, prop.PropertyType);
-            }
-            else
-            {
-                il.Emit(OpCodes.Castclass, prop.PropertyType);
-            }
-            il.Emit(opcall, set);
             il.Emit(OpCodes.Ret);
 
             return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
@@ -575,28 +555,20 @@ namespace blqw
             var dm = new DynamicMethod("", null, Types2Object, true);
             var il = dm.GetILGenerator();
 
-            OpCode opst;
             if (field.IsStatic)
             {
                 il.Emit(OpCodes.Ldarg_1);
-                opst = OpCodes.Stsfld;
+                EmitCast(il, field.FieldType, false);
+                il.Emit(OpCodes.Stsfld, field);
             }
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
                 EmitCast(il, field.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                opst = OpCodes.Stfld;
+                EmitCast(il, field.FieldType, false);
+                il.Emit(OpCodes.Stfld, field);
             }
-            if (field.FieldType.IsValueType)
-            {
-                il.Emit(OpCodes.Unbox_Any, field.FieldType);
-            }
-            else
-            {
-                il.Emit(OpCodes.Castclass, field.FieldType);
-            }
-            il.Emit(opst, field);
             il.Emit(OpCodes.Ret);
             return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
         }
