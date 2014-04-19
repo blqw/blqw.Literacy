@@ -276,7 +276,7 @@ namespace blqw
         /// <param name="hasNonPublic">是否一起加载非公开的静态字段</param>
         void ILoadMember.StaticField(bool hasNonPublic)
         {
-            if (Loaded(3))
+            if (Loaded(hasNonPublic ? 3 : 4))
             {
                 return;
             }
@@ -303,7 +303,7 @@ namespace blqw
         /// </summary>
         void ILoadMember.NonPublicProperty()
         {
-            if (Loaded(4))
+            if (Loaded(5))
             {
                 return;
             }
@@ -323,7 +323,7 @@ namespace blqw
         /// <param name="hasNonPublic">是否一起加载非公开的静态字段</param>
         void ILoadMember.StaticProperty(bool hasNonPublic)
         {
-            if (Loaded(5))
+            if (Loaded(hasNonPublic ? 6 : 7))
             {
                 return;
             }
@@ -537,28 +537,28 @@ namespace blqw
                 return null;
             }
             var il = dm.GetILGenerator();
-
+            OpCode opcall;
             if (set.IsStatic)
             {
                 il.Emit(OpCodes.Ldarg_1);
-                EmitCast(il, prop.PropertyType);
-                il.Emit(OpCodes.Call, set);
+                opcall = OpCodes.Call;
             }
             else
             {
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Castclass, prop.DeclaringType);
                 il.Emit(OpCodes.Ldarg_1);
-                if (prop.PropertyType.IsValueType)
-                {
-                    il.Emit(OpCodes.Unbox_Any, prop.PropertyType);
-                }
-                else
-                {
-                    il.Emit(OpCodes.Castclass, prop.PropertyType);
-                }
-                il.Emit(OpCodes.Callvirt, set);
+                opcall = OpCodes.Callvirt;
             }
+            if (prop.PropertyType.IsValueType)
+            {
+                il.Emit(OpCodes.Unbox_Any, prop.PropertyType);
+            }
+            else
+            {
+                il.Emit(OpCodes.Castclass, prop.PropertyType);
+            }
+            il.Emit(opcall, set);
             il.Emit(OpCodes.Ret);
 
             return (LiteracySetter)dm.CreateDelegate(typeof(LiteracySetter));
