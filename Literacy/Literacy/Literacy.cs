@@ -52,7 +52,7 @@ namespace blqw
                 {
                     if (item.TryGetValue(type, out lit) == false)
                     {
-                        lit = new Literacy(type);
+                        lit = new Literacy(type, ignoreCase);
                         item.Add(type, lit);
                     }
                 }
