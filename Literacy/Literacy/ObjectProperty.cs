@@ -294,7 +294,15 @@ namespace blqw
                 Setter(instance, null);
                 return;
             }
-            if (MemberType.IsInstanceOfType(value) == false)
+            if (MemberType.IsEnum)
+            {
+                var str = value as string;
+                if (str != null)
+                {
+                    value = Enum.Parse(MemberType, str, true);
+                }
+            }
+            else if (MemberType.IsInstanceOfType(value) == false)
             {
                 value = Convert.ChangeType(value, MemberType);
             }
@@ -330,7 +338,15 @@ namespace blqw
 
             try
             {
-                if (MemberType.IsInstanceOfType(value) == false)
+                if (MemberType.IsEnum)
+                {
+                    var str = value as string;
+                    if (str != null)
+                    {
+                        value = Enum.Parse(MemberType, str, true);
+                    }
+                }
+                else if (MemberType.IsInstanceOfType(value) == false)
                 {
                     value = Convert.ChangeType(value, MemberType);
                 }
