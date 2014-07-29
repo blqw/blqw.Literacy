@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+using System.Linq;
 namespace UnitTest
 {
     [TestClass]
@@ -322,5 +322,67 @@ namespace UnitTest
             Assert.AreEqual("A", obj2.ClassProperty);
             Assert.AreEqual(1, obj2.StructProperty);
         }
+
+        //测试类型特性
+        [TestMethod]
+        public void TestTypeAttr()
+        {
+            var lit1 = blqw.Literacy.Cache(typeof(ClassEntity), false);
+            Assert.AreEqual(3, lit1.Attributes.Count);
+            Assert.IsTrue(lit1.Attributes.Exists(typeof(TestAttribute)));
+            Assert.IsTrue(lit1.Attributes.Exists<TestAttribute>());
+            Assert.IsTrue(lit1.Attributes.Exists<TestAttribute>(it => it.ID == 0));
+            Assert.IsFalse(lit1.Attributes.Exists(typeof(TestMethodAttribute)));
+            Assert.IsFalse(lit1.Attributes.Exists<TestMethodAttribute>());
+            Assert.IsFalse(lit1.Attributes.Exists<TestMethodAttribute>(it => true));
+            Assert.IsFalse(lit1.Attributes.Exists<TestMethodAttribute>(it => false));
+
+            Assert.AreEqual(3, lit1.Attributes.Where(typeof(TestAttribute)).Count());
+            Assert.AreEqual(3, lit1.Attributes.Where<TestAttribute>().Count());
+            Assert.AreEqual(2, lit1.Attributes.Where<TestAttribute>(it => it.ID > 0).Count());
+            Assert.AreEqual(0, lit1.Attributes.Where(typeof(TestMethodAttribute)).Count());
+            Assert.AreEqual(0, lit1.Attributes.Where<TestMethodAttribute>().Count());
+            Assert.AreEqual(0, lit1.Attributes.Where<TestMethodAttribute>(it => true).Count());
+            Assert.AreEqual(0, lit1.Attributes.Where<TestMethodAttribute>(it => false).Count());
+
+
+            var lit2 = blqw.Literacy.Cache(typeof(StructEntity), false);
+            Assert.AreEqual(2, lit2.Attributes.Count);
+            Assert.IsNotNull(lit2.Attributes.First(typeof(TestAttribute)));
+            Assert.IsNotNull(lit2.Attributes.First<TestAttribute>());
+            Assert.IsNotNull(lit2.Attributes.First<TestAttribute>(it => it.ID == 0));
+
+            Assert.IsNull(lit2.Attributes.First(typeof(TestMethodAttribute)));
+            Assert.IsNull(lit2.Attributes.First<TestMethodAttribute>());
+            Assert.IsNull(lit2.Attributes.First<TestMethodAttribute>(it => true));
+            Assert.IsNull(lit2.Attributes.First<TestMethodAttribute>(it => false));
+
+        }
+        //测试属性特性
+        [TestMethod]
+        public void TestPropertyAttr()
+        {
+            var lit1 = blqw.Literacy.Cache(typeof(ClassEntity), false);
+            var lit2 = blqw.Literacy.Cache(typeof(StructEntity), false);
+            lit1.Load.NonPublicProperty();
+            lit1.Load.StaticProperty(true);
+            lit2.Load.NonPublicProperty();
+            lit2.Load.StaticProperty(true);
+
+            Assert.AreEqual(2, lit1.Property["ClassProperty"].Attributes.Count);
+            Assert.AreEqual(1, lit1.Property["StructProperty"].Attributes.Count);
+            Assert.AreEqual(1, lit1.Property["StaticClassProperty"].Attributes.Count);
+            Assert.AreEqual(0, lit1.Property["StaticStructProperty"].Attributes.Count);
+            Assert.AreEqual(6, lit1.Property["StaticClassProperty"].Attributes.First<TestAttribute>().ID);
+
+
+            Assert.AreEqual(1, lit2.Property["ClassProperty"].Attributes.Count);
+            Assert.AreEqual(1, lit2.Property["StructProperty"].Attributes.Count);
+            Assert.AreEqual(2, lit2.Property["StaticClassProperty"].Attributes.Count);
+            Assert.AreEqual(0, lit2.Property["StaticStructProperty"].Attributes.Count);
+            Assert.AreEqual(12, lit2.Property["ClassProperty"].Attributes.First<TestAttribute>().ID);
+        }
+
+
     }
 }

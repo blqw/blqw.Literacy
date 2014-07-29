@@ -364,6 +364,13 @@ namespace blqw
 
         #endregion
 
+        private AttributeCollection _attributes;
+
+        public AttributeCollection Attributes
+        {
+            get { return _attributes ?? (_attributes = new AttributeCollection(Type)); }
+        }
+
         #region 静态的
 
         /// <summary> IL构造一个用于调用对象构造函数的委托

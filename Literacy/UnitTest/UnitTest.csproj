@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="ClassEntity.cs" />
     <Compile Include="StructEntity.cs" />
+    <Compile Include="TestAttribute.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

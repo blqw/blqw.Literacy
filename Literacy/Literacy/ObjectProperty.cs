@@ -358,5 +358,13 @@ namespace blqw
                 return false;
             }
         }
+
+        private AttributeCollection _attributes;
+
+        public AttributeCollection Attributes
+        {
+            get { return _attributes ?? (_attributes = new AttributeCollection(MemberInfo)); }
+        }
+
     }
 }

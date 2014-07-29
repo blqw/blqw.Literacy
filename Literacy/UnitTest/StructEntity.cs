@@ -5,16 +5,18 @@ using System.Text;
 
 namespace UnitTest
 {
+    [Test(ID = 0)]
+    [Test(ID = 11)]
     public struct StructEntity
     {
         public StructEntity(string str, int i)
-            :this()
+            : this()
         {
             ClassProperty = str;
             StructProperty = i;
         }
 
-        public StructEntity( string privateClassProperty,
+        public StructEntity(string privateClassProperty,
                             int privateStructProperty,
                             string privateStaticClassProperty,
                             int privateStaticStructProperty,
@@ -22,7 +24,7 @@ namespace UnitTest
                             int privateStructField,
                             string privateStaticClassField,
                             int privateStaticStructField)
-            :this()
+            : this()
         {
             PrivateClassProperty = privateClassProperty;
             PrivateStructProperty = privateStructProperty;
@@ -35,10 +37,13 @@ namespace UnitTest
         }
 
         //公共实例属性
+        [Test(ID = 12)]
         public string ClassProperty { get; set; }
+        [Test(ID = 13)]
         public int StructProperty { get; set; }
 
         //公共静态属性
+        [Test(ID = 14), Test(ID = 15)]
         public static string StaticClassProperty { get; set; }
         public static int StaticStructProperty { get; set; }
 

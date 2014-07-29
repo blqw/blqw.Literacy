@@ -5,6 +5,9 @@ using System.Text;
 
 namespace UnitTest
 {
+    [Test(ID = 0)]
+    [Test(ID = 1)]
+    [Test(ID = 2)]
     public class ClassEntity
     {
         public ClassEntity()
@@ -19,11 +22,16 @@ namespace UnitTest
 
 
         //公共实例属性
+        [Test(ID = 3)]
+        [Test(ID = 4)]
         public string ClassProperty { get; set; }
+        [Test(ID = 5)]
         public int StructProperty { get; set; }
 
         //公共静态属性
+        [Test(ID = 6)]
         public static string StaticClassProperty { get; set; }
+
         public static int StaticStructProperty { get; set; }
 
         //私有实例属性
