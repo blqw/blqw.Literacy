@@ -110,31 +110,34 @@ namespace blqw
         /// </summary>
         private static readonly Type[] TypesObjectObjects = { typeof(Object), typeof(object[]) };
 
+        /// <summary> 序列
+        /// </summary>
+        internal static int Sequence = 0;
         #endregion
 
         /// <summary> 对象类型
         /// </summary>
-        public Type Type
-        {
-            get;
-            private set;
-        }
+        public Type Type { get; private set; }
 
         /// <summary> 对象属性集合
         /// </summary>
-        public ObjectPropertyCollection Property
-        {
-            get;
-            private set;
-        }
+        public ObjectPropertyCollection Property { get; private set; }
 
         /// <summary> 对象字段集合
         /// </summary>
-        public ObjectPropertyCollection Field
-        {
-            get;
-            private set;
-        }
+        public ObjectPropertyCollection Field { get; private set; }
+
+        /// <summary> 自增id 与ObjectProperty共享序列
+        /// </summary>
+        public readonly int ID;
+
+        /// <summary> Guid
+        /// </summary>
+        public readonly Guid UID;
+
+        /// <summary> 指定对象类型
+        /// </summary>
+        public readonly TypeCodeEx TypeCode;
 
         #region 私有的
 
@@ -191,6 +194,36 @@ namespace blqw
                         Property.Add(a);
                     }
                 }
+            }
+            ID = Interlocked.Increment(ref Sequence);
+            UID = Guid.NewGuid();
+            TypeCode = (TypeCodeEx)Type.GetTypeCode(type);
+            if (TypeCode == TypeCodeEx.Object)
+            {
+                if (type == typeof(System.Collections.IList))
+                {
+                    TypeCode = TypeCodeEx.IList;
+                }
+                else if (type == typeof(System.Collections.IDictionary))
+                {
+                    TypeCode = TypeCodeEx.IDictionary;
+                }
+                else if (type == typeof(TimeSpan))
+                {
+                    TypeCode = TypeCodeEx.TimeSpan;
+                }
+                else if (type == typeof(Guid))
+                {
+                    TypeCode = TypeCodeEx.Guid;
+                }
+                else if (type == typeof(System.Text.StringBuilder))
+                {
+                    TypeCode = TypeCodeEx.StringBuilder;
+                }
+            }
+            else if (type.IsEnum)
+            {
+                TypeCode = TypeCodeEx.Enum;
             }
         }
 

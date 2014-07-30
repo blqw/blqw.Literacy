@@ -29,7 +29,37 @@ namespace blqw
                 Static = get.IsStatic; //get.set只要有一个静态就是静态
                 IsPublic = IsPublic || get.IsPublic;
             }
+            ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
+            UID = Guid.NewGuid();
             Init();
+            TypeCode = (TypeCodeEx)Type.GetTypeCode(MemberType);
+            if (TypeCode == TypeCodeEx.Object)
+            {
+                if (MemberType == typeof(System.Collections.IList))
+                {
+                    TypeCode = TypeCodeEx.IList;
+                }
+                else if (MemberType == typeof(System.Collections.IDictionary))
+                {
+                    TypeCode = TypeCodeEx.IDictionary;
+                }
+                else if (MemberType == typeof(TimeSpan))
+                {
+                    TypeCode = TypeCodeEx.TimeSpan;
+                }
+                else if (MemberType == typeof(Guid))
+                {
+                    TypeCode = TypeCodeEx.Guid;
+                }
+                else if (MemberType == typeof(System.Text.StringBuilder))
+                {
+                    TypeCode = TypeCodeEx.StringBuilder;
+                }
+            }
+            else if (MemberType.IsEnum)
+            {
+                TypeCode = TypeCodeEx.Enum;
+            }
         }
 
         /// <summary> 表示一个可以获取或者设置其内容的对象字段
@@ -45,6 +75,36 @@ namespace blqw
             CanWrite = !field.IsInitOnly; //是否可写取决于ReadOnly
             CanRead = true; //字段一定可以读
             Init();
+            ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
+            UID = Guid.NewGuid();
+            TypeCode = (TypeCodeEx)Type.GetTypeCode(MemberType);
+            if (TypeCode == TypeCodeEx.Object)
+            {
+                if (MemberType == typeof(System.Collections.IList))
+                {
+                    TypeCode = TypeCodeEx.IList;
+                }
+                else if (MemberType == typeof(System.Collections.IDictionary))
+                {
+                    TypeCode = TypeCodeEx.IDictionary;
+                }
+                else if (MemberType == typeof(TimeSpan))
+                {
+                    TypeCode = TypeCodeEx.TimeSpan;
+                }
+                else if (MemberType == typeof(Guid))
+                {
+                    TypeCode = TypeCodeEx.Guid;
+                }
+                else if (MemberType == typeof(System.Text.StringBuilder))
+                {
+                    TypeCode = TypeCodeEx.StringBuilder;
+                }
+            }
+            else if (MemberType.IsEnum)
+            {
+                TypeCode = TypeCodeEx.Enum;
+            }
         }
 
         #region 只读属性
@@ -361,10 +421,23 @@ namespace blqw
 
         private AttributeCollection _attributes;
 
+        /// <summary> 成员特性
+        /// </summary>
         public AttributeCollection Attributes
         {
             get { return _attributes ?? (_attributes = new AttributeCollection(MemberInfo)); }
         }
 
+        /// <summary> 自增id 与Literacy共享序列
+        /// </summary>
+        public readonly int ID;
+
+        /// <summary> Guid
+        /// </summary>
+        public readonly Guid UID;
+
+        /// <summary> 指定对象类型
+        /// </summary>
+        public readonly TypeCodeEx TypeCode;
     }
 }
