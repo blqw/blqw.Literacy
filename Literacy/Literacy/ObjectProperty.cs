@@ -32,34 +32,7 @@ namespace blqw
             ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
             UID = Guid.NewGuid();
             Init();
-            TypeCode = (TypeCodeEx)Type.GetTypeCode(MemberType);
-            if (TypeCode == TypeCodeEx.Object)
-            {
-                if (MemberType == typeof(System.Collections.IList))
-                {
-                    TypeCode = TypeCodeEx.IList;
-                }
-                else if (MemberType == typeof(System.Collections.IDictionary))
-                {
-                    TypeCode = TypeCodeEx.IDictionary;
-                }
-                else if (MemberType == typeof(TimeSpan))
-                {
-                    TypeCode = TypeCodeEx.TimeSpan;
-                }
-                else if (MemberType == typeof(Guid))
-                {
-                    TypeCode = TypeCodeEx.Guid;
-                }
-                else if (MemberType == typeof(System.Text.StringBuilder))
-                {
-                    TypeCode = TypeCodeEx.StringBuilder;
-                }
-            }
-            else if (MemberType.IsEnum)
-            {
-                TypeCode = TypeCodeEx.Enum;
-            }
+            TypeCode = Literacy.GetTypeCodeEx(MemberType);
         }
 
         /// <summary> 表示一个可以获取或者设置其内容的对象字段
@@ -77,34 +50,7 @@ namespace blqw
             Init();
             ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
             UID = Guid.NewGuid();
-            TypeCode = (TypeCodeEx)Type.GetTypeCode(MemberType);
-            if (TypeCode == TypeCodeEx.Object)
-            {
-                if (MemberType == typeof(System.Collections.IList))
-                {
-                    TypeCode = TypeCodeEx.IList;
-                }
-                else if (MemberType == typeof(System.Collections.IDictionary))
-                {
-                    TypeCode = TypeCodeEx.IDictionary;
-                }
-                else if (MemberType == typeof(TimeSpan))
-                {
-                    TypeCode = TypeCodeEx.TimeSpan;
-                }
-                else if (MemberType == typeof(Guid))
-                {
-                    TypeCode = TypeCodeEx.Guid;
-                }
-                else if (MemberType == typeof(System.Text.StringBuilder))
-                {
-                    TypeCode = TypeCodeEx.StringBuilder;
-                }
-            }
-            else if (MemberType.IsEnum)
-            {
-                TypeCode = TypeCodeEx.Enum;
-            }
+            TypeCode = Literacy.GetTypeCodeEx(MemberType);
         }
 
         #region 只读属性
@@ -438,6 +384,6 @@ namespace blqw
 
         /// <summary> 指定对象类型
         /// </summary>
-        public readonly TypeCodeEx TypeCode;
+        public readonly TypeCodes TypeCode;
     }
 }

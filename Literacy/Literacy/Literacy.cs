@@ -88,7 +88,7 @@ namespace blqw
 
         #endregion
 
-        #region static
+        #region private static
 
         /// <summary> typeof(Object)
         /// </summary>
@@ -137,7 +137,7 @@ namespace blqw
 
         /// <summary> 指定对象类型
         /// </summary>
-        public readonly TypeCodeEx TypeCode;
+        public readonly TypeCodes TypeCode;
 
         #region 私有的
 
@@ -197,34 +197,7 @@ namespace blqw
             }
             ID = Interlocked.Increment(ref Sequence);
             UID = Guid.NewGuid();
-            TypeCode = (TypeCodeEx)Type.GetTypeCode(type);
-            if (TypeCode == TypeCodeEx.Object)
-            {
-                if (type == typeof(System.Collections.IList))
-                {
-                    TypeCode = TypeCodeEx.IList;
-                }
-                else if (type == typeof(System.Collections.IDictionary))
-                {
-                    TypeCode = TypeCodeEx.IDictionary;
-                }
-                else if (type == typeof(TimeSpan))
-                {
-                    TypeCode = TypeCodeEx.TimeSpan;
-                }
-                else if (type == typeof(Guid))
-                {
-                    TypeCode = TypeCodeEx.Guid;
-                }
-                else if (type == typeof(System.Text.StringBuilder))
-                {
-                    TypeCode = TypeCodeEx.StringBuilder;
-                }
-            }
-            else if (type.IsEnum)
-            {
-                TypeCode = TypeCodeEx.Enum;
-            }
+            TypeCode = Literacy.GetTypeCodeEx(type);
         }
 
         #endregion
@@ -452,7 +425,7 @@ namespace blqw
                 return null;
             }
             Type type = ctor.DeclaringType;
-            var dm = new DynamicMethod("", TypeObject, TypesObjects, ctor.ReflectedType, true);
+            var dm = new DynamicMethod("", TypeObject, TypesObjects, typeof(object), true);
             var ps = ctor.GetParameters();
             var il = dm.GetILGenerator();
 
@@ -722,6 +695,78 @@ namespace blqw
             il.Emit(OpCodes.Ret);
 
             return (LiteracyCaller)dm.CreateDelegate(typeof(LiteracyCaller));
+        }
+
+        public static TypeCodes GetTypeCodeEx(Type type)
+        {
+            if (type.IsGenericType && type.IsGenericTypeDefinition == false)
+            {
+                var args = type.GetGenericArguments();
+                if (type.IsValueType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    type = args[0];
+                }
+                else if (type.Name.StartsWith("<>f__AnonymousType"))//判断匿名类
+                {
+                    return TypeCodes.AnonymousType;
+                }
+                else if (args.Length == 1)
+                {
+                    if (typeof(IList<>).MakeGenericType(args).IsAssignableFrom(type))
+                    {
+                        return TypeCodes.IListT;
+                    }
+                }
+                if (args.Length == 2)
+                {
+                    if (typeof(IDictionary<,>).MakeGenericType(args).IsAssignableFrom(type))
+                    {
+                        return TypeCodes.IDictionaryT;
+                    }
+                }
+            }
+
+            var code = (TypeCodes)Type.GetTypeCode(type);
+            if (code == TypeCodes.Object)
+            {
+                if (typeof(System.Collections.IList).IsAssignableFrom(type))
+                {
+                    return TypeCodes.IList;
+                }
+                else if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
+                {
+                    return TypeCodes.IDictionary;
+                }
+                else if (typeof(System.Data.IDataReader).IsAssignableFrom(type))
+                {
+                    return TypeCodes.IDataReader;
+                }
+                else if (type == typeof(TimeSpan))
+                {
+                    return TypeCodes.TimeSpan;
+                }
+                else if (type == typeof(Guid))
+                {
+                    return TypeCodes.Guid;
+                }
+                else if (type == typeof(System.Text.StringBuilder))
+                {
+                    return TypeCodes.StringBuilder;
+                }
+                else if (type == typeof(System.Data.DataSet))
+                {
+                    return TypeCodes.DataSet;
+                }
+                else if (type == typeof(System.Data.DataTable))
+                {
+                    return TypeCodes.DataTable;
+                }
+                else if (type == typeof(System.Data.DataView))
+                {
+                    return TypeCodes.DataView;
+                }
+            }
+            return code;
         }
 
         /// <summary> IL类型转换指令
