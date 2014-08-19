@@ -4,8 +4,13 @@ using System.Text;
 
 namespace blqw
 {
+    /// <summary> 用于拓展系统Type对象的属性和方法
+    /// </summary>
     public sealed class TypeInfo
     {
+        /// <summary> 构造用于拓展系统Type对象的属性和方法的对象
+        /// </summary>
+        /// <param name="type">用于构造TypeInfo的Type对象实例,不可为null</param>
         internal TypeInfo(System.Type type)
         {
             if (type == null)
@@ -51,7 +56,7 @@ namespace blqw
                 {
                     if (_literacy == null)
                     {
-                        _literacy = new Literacy(Type, false);
+                        _literacy = new Literacy(this, false);
                     }
                 }
                 return _literacy;
@@ -74,7 +79,7 @@ namespace blqw
                 {
                     if (_ignoreCaseLiteracy == null)
                     {
-                        _ignoreCaseLiteracy = new Literacy(Type, true);
+                        _ignoreCaseLiteracy = new Literacy(this, true);
                     }
                 }
                 return _ignoreCaseLiteracy;
@@ -103,13 +108,11 @@ namespace blqw
         /// </summary>
         public readonly bool IsNumberType;
 
-
         /// <summary> 获取类型枚举
         /// </summary>
         public readonly TypeCode TypeCode;
 
-
-        TypeCodes _typeCodes = (blqw.TypeCodes)(-1);
+        private TypeCodes _typeCodes = (blqw.TypeCodes)(-1);
         /// <summary> 获取类型的拓展枚举
         /// </summary>
         public TypeCodes TypeCodes
@@ -132,23 +135,23 @@ namespace blqw
         {
             get
             {
-                if (_isSpecialType > 0)
+                if (_isSpecialType == 0)
                 {
-                    if (_typeCodes < 0)
-                    {
-                        _typeCodes = GetTypeCodes();
-                    }
-                    if (_typeCodes < (TypeCodes)100)
-                    {
-                        _isSpecialType = 1;
-                    }
-                    else if (Type.IsPrimitive)
+                    if (Type.IsPrimitive)
                     {
                         _isSpecialType = 1;
                     }
                     else
                     {
-                        _isSpecialType = 2;
+                        var codes = (int)TypeCodes;
+                        if (codes > 2 && codes < 100)
+                        {
+                            _isSpecialType = 1;
+                        }
+                        else
+                        {
+                            _isSpecialType = 2;
+                        }
                     }
                 }
                 return _isSpecialType == 1;
@@ -170,7 +173,7 @@ namespace blqw
             }
         }
 
-        public TypeInfo[] _genericArgumentsTypeInfo;
+        private TypeInfo[] _genericArgumentsTypeInfo;
 
         /// <summary> 获取当前泛型类型的泛型参数信息,如果不是已构造的泛型类型,返回null
         /// </summary>
@@ -196,15 +199,12 @@ namespace blqw
                         {
                             _genericArgumentsTypeInfo[i] = TypesHelper.GetTypeInfo(args[i]);
                         }
-                    } 
+                    }
                 }
                 return _genericArgumentsTypeInfo;
             }
         }
-        
 
-        
-        
         #region 私有方法
 
         /// <summary> 获取当前类型的 TypeCodes 值
@@ -299,7 +299,7 @@ namespace blqw
         {
             if (IsNullable)
             {
-                return UnderlyingType.DisplayName;
+                return UnderlyingType.DisplayName + "?";
             }
             if (Type.IsGenericType)
             {
@@ -348,8 +348,27 @@ namespace blqw
                 name = name.Remove(index);
             }
             return name;
-        } 
+        }
 
         #endregion
+
+        public override bool Equals(object obj)
+        {
+            if (object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            var info = obj as TypeInfo;
+            if (info == null)
+            {
+                return false;
+            }
+            return object.ReferenceEquals(this.Type, info.Type);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Type.GetHashCode();
+        }
     }
 }

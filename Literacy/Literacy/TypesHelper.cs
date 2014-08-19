@@ -4,9 +4,11 @@ using System.Text;
 
 namespace blqw
 {
+    /// <summary> 存放用于处理Type对象的静态方法
+    /// </summary>
     public static class TypesHelper
     {
-        private static readonly Dictionary<Type, TypeInfo> _cache = CreateCache();
+        private static readonly Dictionary<Type, TypeInfo> Cache = CreateCache();
 
         private static Dictionary<Type, TypeInfo> CreateCache()
         {
@@ -18,6 +20,19 @@ namespace blqw
             return new Dictionary<Type, TypeInfo>(count);
         }
 
+        /// <summary> 获取TypeInfo对象
+        /// </summary>
+        /// <typeparam name="T">用于构造TypeInfo对象的Type类型</typeparam>
+        /// <returns></returns>
+        public static TypeInfo GetTypeInfo<T>()
+        {
+            return GetTypeInfo(typeof(T));
+        }
+
+        /// <summary> 获取TypeInfo对象
+        /// </summary>
+        /// <param name="type">用于构造TypeInfo对象的Type类型实例,不可为null</param>
+        /// <returns></returns>
         public static TypeInfo GetTypeInfo(
 #if !NF2
 this
@@ -29,16 +44,16 @@ Type type)
                 return null;
             }
             TypeInfo info;
-            if (_cache.TryGetValue(type, out info))
+            if (Cache.TryGetValue(type, out info))
             {
                 return info;
             }
-            lock (_cache)
+            lock (Cache)
             {
-                if (_cache.TryGetValue(type, out info) == false)
+                if (Cache.TryGetValue(type, out info) == false)
                 {
                     info = new TypeInfo(type);
-                    _cache.Add(type, info);
+                    Cache.Add(type, info);
                 }
                 return info;
             }
@@ -71,6 +86,23 @@ Type t)
                 return false;
             }
             return IsNumberType(type);
+        }
+
+        /// <summary> 指示对象是否是数字类型
+        /// </summary>
+        public static bool IsNumber(object obj)
+        {
+            if (obj is Enum)
+            {
+                return true;
+            }
+            var conv = obj as IConvertible;
+            if (conv != null)
+            {
+                var code = conv.GetTypeCode();
+                return code >= TypeCode.SByte && code <= TypeCode.Decimal;
+            }
+            return false;
         }
 
         /// <summary> 检查一个类型是否为可空值类型
@@ -154,7 +186,7 @@ Type t)
         /// </summary>
         public static bool IsSpecialType(
 #if !NF2
-            this
+this
 #endif
 Type t)
         {
@@ -166,8 +198,10 @@ Type t)
             {
                 return true;
             }
-            return (int)GetTypeInfo(t).TypeCodes < 100;
+            var codes = (int)GetTypeInfo(t).TypeCodes;
+            return codes > 2 && codes < 100;
         }
+
     }
 
 

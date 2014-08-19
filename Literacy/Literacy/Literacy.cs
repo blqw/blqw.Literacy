@@ -12,14 +12,6 @@ namespace blqw
     {
         #region Cache
 
-        /// <summary> 一般缓存
-        /// </summary>
-        private static readonly Dictionary<Type, Literacy> Items = new Dictionary<Type, Literacy>(255);
-
-        /// <summary> 忽略大小写缓存
-        /// </summary>
-        private static readonly Dictionary<Type, Literacy> IgnoreCaseItems = new Dictionary<Type, Literacy>(255);
-
         /// <summary> 方法缓存
         /// </summary>
         private static readonly Dictionary<MethodInfo, LiteracyCaller> Callers =
@@ -37,30 +29,11 @@ namespace blqw
             {
                 throw new ArgumentNullException("type");
             }
-            Literacy lit;
-            Dictionary<Type, Literacy> item = ignoreCase ? IgnoreCaseItems : Items;
-            if (item.TryGetValue(type, out lit))
-            {
-                if (lit.Type != type)
-                {
-                    throw new ArgumentException("缓存中的对象类型与参数type不一致!");
-                }
-            }
-            else
-            {
-                lock (item)
-                {
-                    if (item.TryGetValue(type, out lit) == false)
-                    {
-                        lit = new Literacy(type, ignoreCase);
-                        item.Add(type, lit);
-                    }
-                }
-            }
-            return lit;
+            var info = TypesHelper.GetTypeInfo(type);
+            return ignoreCase ? info.IgnoreCaseLiteracy : info.Literacy;
         }
 
-        /// <summary> 获取缓存
+        /// <summary> 获取方法缓存
         /// </summary>
         /// <param name="method">调用方法</param>
         /// <exception cref="ArgumentNullException">参数method为null</exception>
@@ -117,7 +90,7 @@ namespace blqw
 
         /// <summary> 对象类型
         /// </summary>
-        public Type Type { get; private set; }
+        public readonly Type Type;
 
         /// <summary> 对象属性集合
         /// </summary>
@@ -137,7 +110,11 @@ namespace blqw
 
         /// <summary> 指定对象类型
         /// </summary>
-        public readonly TypeCodes TypeCode;
+        public readonly TypeCodes TypeCodes;
+
+        /// <summary> TypeInfo
+        /// </summary>
+        public TypeInfo TypeInfo { get; private set; }
 
         #region 私有的
 
@@ -176,15 +153,22 @@ namespace blqw
         /// <param name="type">需快速访问的类型</param>
         /// <param name="ignoreCase">是否区分大小写(不区分大小写时应保证类中没有同名的(仅大小写不同的)属性或字段)</param>
         public Literacy(Type type, bool ignoreCase)
+            : this(TypesHelper.GetTypeInfo(type), ignoreCase)
         {
-            if (type == null)
+        }
+
+        internal Literacy(TypeInfo info, bool ignoreCase)
+        {
+            if (info == null)
             {
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException("info");
             }
-            Type = type;
+
+            TypeInfo = info;
+            Type = info.Type;
             _CallNewObject = PreNewObject;
             Property = new ObjectPropertyCollection(ignoreCase);
-            foreach (var p in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var p in Type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (p.GetIndexParameters().Length == 0) //排除索引器
                 {
@@ -197,7 +181,7 @@ namespace blqw
             }
             ID = Interlocked.Increment(ref Sequence);
             UID = Guid.NewGuid();
-            TypeCode = Literacy.GetTypeCodeEx(type);
+            TypeCodes = info.TypeCodes;
         }
 
         #endregion
@@ -372,7 +356,7 @@ namespace blqw
 
         private AttributeCollection _attributes;
 
-        public AttributeCollection Attributes
+        public AttributeCollection Attributes   
         {
             get { return _attributes ?? (_attributes = new AttributeCollection(Type)); }
         }
@@ -695,78 +679,6 @@ namespace blqw
             il.Emit(OpCodes.Ret);
 
             return (LiteracyCaller)dm.CreateDelegate(typeof(LiteracyCaller));
-        }
-
-        public static TypeCodes GetTypeCodeEx(Type type)
-        {
-            if (type.IsGenericType && type.IsGenericTypeDefinition == false)
-            {
-                var args = type.GetGenericArguments();
-                if (type.IsValueType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-                {
-                    type = args[0];
-                }
-                else if (type.Name.StartsWith("<>f__AnonymousType"))//判断匿名类
-                {
-                    return TypeCodes.AnonymousType;
-                }
-                else if (args.Length == 1)
-                {
-                    if (typeof(IList<>).MakeGenericType(args).IsAssignableFrom(type))
-                    {
-                        return TypeCodes.IListT;
-                    }
-                }
-                if (args.Length == 2)
-                {
-                    if (typeof(IDictionary<,>).MakeGenericType(args).IsAssignableFrom(type))
-                    {
-                        return TypeCodes.IDictionaryT;
-                    }
-                }
-            }
-
-            var code = (TypeCodes)Type.GetTypeCode(type);
-            if (code == TypeCodes.Object)
-            {
-                if (typeof(System.Collections.IList).IsAssignableFrom(type))
-                {
-                    return TypeCodes.IList;
-                }
-                else if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
-                {
-                    return TypeCodes.IDictionary;
-                }
-                else if (typeof(System.Data.IDataReader).IsAssignableFrom(type))
-                {
-                    return TypeCodes.IDataReader;
-                }
-                else if (type == typeof(TimeSpan))
-                {
-                    return TypeCodes.TimeSpan;
-                }
-                else if (type == typeof(Guid))
-                {
-                    return TypeCodes.Guid;
-                }
-                else if (type == typeof(System.Text.StringBuilder))
-                {
-                    return TypeCodes.StringBuilder;
-                }
-                else if (type == typeof(System.Data.DataSet))
-                {
-                    return TypeCodes.DataSet;
-                }
-                else if (type == typeof(System.Data.DataTable))
-                {
-                    return TypeCodes.DataTable;
-                }
-                else if (type == typeof(System.Data.DataView))
-                {
-                    return TypeCodes.DataView;
-                }
-            }
-            return code;
         }
 
         /// <summary> IL类型转换指令
