@@ -1,5 +1,7 @@
 使用IL.Emit方式快速访问属性,字段和方法  
 http://www.cnblogs.com/blqw/p/Literacy.html
+这个项目是一个非常独立的代码库,使用.net2.0编译,不需要引用其他任何dll和别的项目
+在我其他项目中,几乎都引用了这个项目,比如blqw.Core blqw.Json等
 
 #### 更新说明  
 * 2014.07.30  
