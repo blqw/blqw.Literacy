@@ -49,14 +49,14 @@ namespace UnitTest
             Assert.IsTrue(int_info.IsMakeGenericType);
             Assert.IsTrue(int_info.IsNullable);
             Assert.IsTrue(int_info.IsNumberType);
-            Assert.AreEqual(typeof(int), int_info.UnderlyingType.Type);
+            Assert.AreEqual(typeof(int), int_info.NullableUnderlyingType.Type);
 
             Assert.IsTrue(string_info.IsSpecialType);
             Assert.IsFalse(string_info.IsArray);
             Assert.IsFalse(string_info.IsMakeGenericType);
             Assert.IsFalse(string_info.IsNullable);
             Assert.IsFalse(string_info.IsNumberType);
-            Assert.IsNull(string_info.UnderlyingType);
+            Assert.IsNull(string_info.NullableUnderlyingType);
 
             Assert.IsFalse(list_info.IsSpecialType);
             Assert.IsFalse(list_info.IsArray);

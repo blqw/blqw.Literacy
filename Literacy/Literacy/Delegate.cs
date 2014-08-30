@@ -24,4 +24,15 @@ namespace blqw
     /// <param name="args">构造器参数</param>
     public delegate object LiteracyNewObject(params object[] args);
 
+    /// <summary> 转换对象的委托,返回是否转换成功
+    /// </summary>
+    /// <param name="input">包含要转换的对象</param>
+    /// <param name="result">当此方法返回时，如果转换成功，则包含转换后的值</param>
+    public delegate bool LiteracyTryParse(object input, out object result);
+
+    /// <summary> 转换对象的委托,返回是否转换成功
+    /// </summary>
+    /// <param name="input">包含要转换的对象</param>
+    /// <param name="result">当此方法返回时，如果转换成功，则包含转换后的值</param>
+    public delegate bool LiteracyTryParse<T>(object input, out T result);
 }

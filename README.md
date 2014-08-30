@@ -4,12 +4,16 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 在我的其他项目中,几乎都引用了这个项目,比如blqw.Core, blqw.Json, blqw.Data 等  
 
 ## 更新说明  
+#### 2014.08.31  
+* 增加静态类 Convert2, 用于转换对象  
+* TypeInfo增加TryParse和Convert方法 用于转换对象   
+  
 #### 2014.08.19  
 * 增加静态类 TypesHelper, 存放用于处理Type对象的静态方法  
 * 增加密封类 TypeInfo, 用于拓展系统Type对象的属性和方法  
 * 修改Literacy类中的缓存,将操作转移至TypesHelper  
 * 修改TypeCodes的计算方法,将操作转移至TypeInfo
-
+  
 #### 2014.07.30  
 * 为Literacy和ObjectProperty实体增加ID(自增标识,2个类共享自增序列)和UID(全球唯一标识符GUID)方便在做缓存的时候作为key使用  
 * 增加TypeCodes枚举,用于扩展系统的TypeCode 会稍微影响构造Literacy的速度,但是由于Literacy本身是全局缓存,所以影响不大

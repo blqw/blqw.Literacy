@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 namespace blqw
 {
     /// <summary> 用于拓展系统Type对象的属性和方法
     /// </summary>
+    [DebuggerDisplay("Type: {DisplayName} TypeCodes: {TypeCodes} TypeCode: {TypeCode}")]
     public sealed class TypeInfo
     {
         /// <summary> 构造用于拓展系统Type对象的属性和方法的对象
@@ -20,17 +23,24 @@ namespace blqw
             Type = type;
             TypeCode = System.Type.GetTypeCode(type);
             IsArray = type.IsArray;
+
             IsMakeGenericType = type.IsGenericType && !type.IsGenericTypeDefinition;
             var valueType = Nullable.GetUnderlyingType(type);
-            if (valueType != null)
+            if (valueType != null) //判断可空值类型
             {
                 IsNullable = true;
-                UnderlyingType = TypesHelper.GetTypeInfo(valueType);
-                IsNumberType = UnderlyingType.IsNumberType;
+                NullableUnderlyingType = TypesHelper.GetTypeInfo(valueType);
+                type = valueType;
             }
-            else if (type.IsEnum)
+
+            if (type.IsEnum)
             {
                 IsNumberType = true;
+                EnumUnderlyingType = TypesHelper.GetTypeInfo(Enum.GetUnderlyingType(Type));
+            }
+            else if (IsNullable)
+            {
+                IsNumberType = NullableUnderlyingType.IsNumberType;
             }
             else
             {
@@ -93,7 +103,10 @@ namespace blqw
         public readonly System.Type Type;
         /// <summary> 如果IsNullable为true, 该字段获取可空值类型的实际类型, 否则为空
         /// </summary>
-        public readonly TypeInfo UnderlyingType;
+        public readonly TypeInfo NullableUnderlyingType;
+        /// <summary> 如果Type.IsEnum为true, 该字段获取枚举类型的实际类型, 否则为空
+        /// </summary>
+        public readonly TypeInfo EnumUnderlyingType;
         /// <summary> 是否为可空值类型
         /// </summary>
         public readonly bool IsNullable;
@@ -205,6 +218,29 @@ namespace blqw
             }
         }
 
+        private LiteracyTryParse _tryParse;
+
+        public LiteracyTryParse TryParse
+        {
+            get
+            {
+                if (_tryParse == null)
+                {
+                    _tryParse = CreateDelegate();
+                }
+                return _tryParse;
+            }
+        }
+
+        public object Convert(object input)
+        {
+            object value;
+            if (TryParse(input, out value))
+            {
+                return value;
+            }
+                throw new InvalidCastException(string.Concat("值 '", ((object)input ?? "<NULL>").ToString(), "' 无法转为 ", DisplayName, " 类型"));
+        }
         #region 私有方法
 
         /// <summary> 获取当前类型的 TypeCodes 值
@@ -213,9 +249,12 @@ namespace blqw
         {
             if (IsNullable) //可空值类型
             {
-                return UnderlyingType.GetTypeCodes();
+                return NullableUnderlyingType.GetTypeCodes();
             }
-
+            if (Type.IsEnum)
+            {
+                return blqw.TypeCodes.Enum;
+            }
             if (IsMakeGenericType) //泛型类型
             {
                 if (Type.Name.StartsWith("<>f__AnonymousType"))//判断匿名类
@@ -299,7 +338,7 @@ namespace blqw
         {
             if (IsNullable)
             {
-                return UnderlyingType.DisplayName + "?";
+                return NullableUnderlyingType.DisplayName + "?";
             }
             if (Type.IsGenericType)
             {
@@ -350,6 +389,97 @@ namespace blqw
             return name;
         }
 
+        private LiteracyTryParse CreateDelegate()
+        {
+            switch (TypeCodes)
+            {
+                case TypeCodes.Empty:
+                    return (object input, out object result) => {
+                        result = null;
+                        return (input == null || input is DBNull);
+                    };
+                case TypeCodes.DBNull:
+                    return (object input, out object result) => {
+                        if (input == null || input is DBNull)
+                        {
+                            result = DBNull.Value;
+                            return true;
+                        }
+                        result = null;
+                        return false;
+                    };
+                case TypeCodes.Boolean:
+                    return CreateDelegate<Boolean>(Convert2.TryParseBoolean);
+                case TypeCodes.Char:
+                    return CreateDelegate<Char>(Convert2.TryParseChar);
+                case TypeCodes.SByte:
+                    return CreateDelegate<SByte>(Convert2.TryParseSByte);
+                case TypeCodes.Byte:
+                    return CreateDelegate<Byte>(Convert2.TryParseByte);
+                case TypeCodes.Int16:
+                    return CreateDelegate<Int16>(Convert2.TryParseInt16);
+                case TypeCodes.UInt16:
+                    return CreateDelegate<UInt16>(Convert2.TryParseUInt16);
+                case TypeCodes.Int32:
+                    return CreateDelegate<Int32>(Convert2.TryParseInt32);
+                case TypeCodes.UInt32:
+                    return CreateDelegate<UInt32>(Convert2.TryParseUInt32);
+                case TypeCodes.Int64:
+                    return CreateDelegate<Int64>(Convert2.TryParseInt64);
+                case TypeCodes.UInt64:
+                    return CreateDelegate<UInt64>(Convert2.TryParseUInt64);
+                case TypeCodes.Single:
+                    return CreateDelegate<Single>(Convert2.TryParseSingle);
+                case TypeCodes.Double:
+                    return CreateDelegate<Double>(Convert2.TryParseDouble);
+                case TypeCodes.Decimal:
+                    return CreateDelegate<Decimal>(Convert2.TryParseDecimal);
+                case TypeCodes.DateTime:
+                    return CreateDelegate<DateTime>(Convert2.TryParseDateTime);
+                case TypeCodes.String:
+                    return CreateDelegate<String>(Convert2.TryParseString);
+                case TypeCodes.Guid:
+                    return CreateDelegate<Guid>(Convert2.TryParseGuid);
+                case TypeCodes.TimeSpan:
+                    return CreateDelegate<TimeSpan>(Convert2.TryParseTimeSpan);
+                case TypeCodes.IntPtr:
+                    return CreateDelegate<IntPtr>(Convert2.TryParseIntPtr);
+                case TypeCodes.UIntPtr:
+                    return CreateDelegate<UIntPtr>(Convert2.TryParseUIntPtr);
+                case TypeCodes.Enum:
+                    var type = IsNullable ? NullableUnderlyingType.Type : Type;
+                    var parse = Convert2.TryParseEnumMethod.MakeGenericMethod(type);
+                    var create = this.GetType().GetMethod("CreateDelegate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                    create = create.MakeGenericMethod(type);
+                    return (LiteracyTryParse)create.Invoke(null, new object[] { Delegate.CreateDelegate(typeof(LiteracyTryParse<>).MakeGenericType(type), parse) });
+                default:
+                    type = IsNullable ? NullableUnderlyingType.Type : Type;
+                    return (object input, out object result) => {
+                        if (type.IsInstanceOfType(input))
+                        {
+                            result = input;
+                            return true;
+                        }
+                        result = null;
+                        return false;
+                    };
+            }
+        }
+
+        private static LiteracyTryParse CreateDelegate<T>(LiteracyTryParse<T> tryParse)
+        {
+            return (object input, out object result) => {
+                T t;
+                if (tryParse(input, out t))
+                {
+                    result = t;
+                    return true;
+                }
+                result = null;
+                return false;
+            };
+        }
+
         #endregion
 
         public override bool Equals(object obj)
@@ -370,5 +500,6 @@ namespace blqw
         {
             return this.Type.GetHashCode();
         }
+
     }
 }

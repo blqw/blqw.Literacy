@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributeCollection.cs" />
+    <Compile Include="Convert2.cs" />
     <Compile Include="Delegate.cs" />
     <Compile Include="ILoadMember.cs" />
     <Compile Include="Literacy.cs" />

@@ -356,7 +356,7 @@ namespace blqw
 
         private AttributeCollection _attributes;
 
-        public AttributeCollection Attributes   
+        public AttributeCollection Attributes
         {
             get { return _attributes ?? (_attributes = new AttributeCollection(Type)); }
         }

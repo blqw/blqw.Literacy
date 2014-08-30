@@ -222,7 +222,7 @@ namespace blqw
             if (TypeInfo.IsNullable)
             {
                 Nullable = true;
-                MemberType = TypeInfo.UnderlyingType.Type;
+                MemberType = TypeInfo.NullableUnderlyingType.Type;
             }
             else
             {
@@ -303,7 +303,7 @@ namespace blqw
                     throw new ArgumentNullException("instance", "实例属性对象不能为null");
                 }
             }
-            else if ((OriginalType.IsClass || Nullable) && (value == null || value is DBNull))
+            else if ((value == null || value is DBNull) && (OriginalType.IsClass || Nullable))
             {
                 Setter(instance, null);
                 return;
@@ -344,7 +344,7 @@ namespace blqw
             {
                 return false;
             }
-            else if ((OriginalType.IsClass || Nullable) && (value == null || value is DBNull))
+            else if ((value == null || value is DBNull) && (OriginalType.IsClass || Nullable))
             {
                 Setter(instance, null);
                 return true;
