@@ -86,7 +86,10 @@ namespace blqw
         {
             foreach (var item in _Items.Values)
             {
-                yield return item;
+                if (item.AutoField == false)
+                {
+                    yield return item;
+                }
             }
         }
         /// <summary> 支持在属性或字段集合上进行简单迭代。
@@ -99,7 +102,10 @@ namespace blqw
             {
                 foreach (var item in _Items.Values)
                 {
-                    yield return item;
+                    if (item.AutoField == false)
+                    {
+                        yield return item;
+                    }
                 }
             }
             else if (canwirte == null)
@@ -107,7 +113,7 @@ namespace blqw
                 var b = canread.Value;
                 foreach (var item in _Items.Values)
                 {
-                    if (item.CanRead == b)
+                    if (item.CanRead == b && item.AutoField == false)
                     {
                         yield return item;
                     }
@@ -118,7 +124,7 @@ namespace blqw
                 var b = canwirte.Value;
                 foreach (var item in _Items.Values)
                 {
-                    if (item.CanWrite == b)
+                    if (item.CanWrite == b && item.AutoField == false)
                     {
                         yield return item;
                     }
@@ -130,7 +136,7 @@ namespace blqw
                 var b = canwirte.Value;
                 foreach (var item in _Items.Values)
                 {
-                    if (item.CanWrite == b && item.CanRead == a)
+                    if (item.CanWrite == b && item.CanRead == a && item.AutoField == false)
                     {
                         yield return item;
                     }

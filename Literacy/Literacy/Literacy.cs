@@ -230,10 +230,7 @@ namespace blqw
             const BindingFlags bf = BindingFlags.Public | BindingFlags.Instance;
             foreach (var f in Type.GetFields(bf))
             {
-                if (f.Name.Contains("<") == false)
-                {
-                    Field.Add(new ObjectProperty(f));
-                }
+                Field.Add(new ObjectProperty(f));
             }
             Monitor.Exit(this);
         }
@@ -253,10 +250,7 @@ namespace blqw
             const BindingFlags bf = BindingFlags.NonPublic | BindingFlags.Instance;
             foreach (var f in Type.GetFields(bf))
             {
-                if (f.Name.Contains("<") == false)
-                {
-                    Field.Add(new ObjectProperty(f));
-                }
+                Field.Add(new ObjectProperty(f));
             }
             Monitor.Exit(this);
         }
@@ -281,7 +275,7 @@ namespace blqw
             }
             foreach (var f in Type.GetFields(bf))
             {
-                if (f.Name.Contains("<") == false && Field.ContainsKey(f.Name) == false)
+                if (Field.ContainsKey(f.Name) == false)
                 {
                     Field.Add(new ObjectProperty(f));
                 }
@@ -541,7 +535,7 @@ namespace blqw
         /// </summary>
         public static LiteracySetter CreateSetter(FieldInfo field)
         {
-            if (field == null || field.IsInitOnly)
+            if (field == null || field.IsLiteral)
             {
                 return null;
             }

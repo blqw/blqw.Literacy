@@ -239,8 +239,9 @@ namespace blqw
             {
                 return value;
             }
-                throw new InvalidCastException(string.Concat("值 '", ((object)input ?? "<NULL>").ToString(), "' 无法转为 ", DisplayName, " 类型"));
+            throw new InvalidCastException(string.Concat("值 '", ((object)input ?? "<NULL>").ToString(), "' 无法转为 ", DisplayName, " 类型"));
         }
+
         #region 私有方法
 
         /// <summary> 获取当前类型的 TypeCodes 值
@@ -284,19 +285,7 @@ namespace blqw
 
             if (TypeCode == TypeCode.Object)
             {
-                if (typeof(System.Collections.IList).IsAssignableFrom(Type))
-                {
-                    return TypeCodes.IList;
-                }
-                else if (typeof(System.Collections.IDictionary).IsAssignableFrom(Type))
-                {
-                    return TypeCodes.IDictionary;
-                }
-                else if (typeof(System.Data.IDataReader).IsAssignableFrom(Type))
-                {
-                    return TypeCodes.IDataReader;
-                }
-                else if (Type == typeof(TimeSpan))
+                if (Type == typeof(TimeSpan))
                 {
                     return TypeCodes.TimeSpan;
                 }
@@ -327,6 +316,30 @@ namespace blqw
                 else if (Type == typeof(UIntPtr))
                 {
                     return TypeCodes.UIntPtr;
+                }
+                else if (Type == typeof(System.Xml.XmlDocument))
+                {
+                    return TypeCodes.Xml;
+                }
+                else if (typeof(System.Collections.IList).IsAssignableFrom(Type))
+                {
+                    return TypeCodes.IList;
+                }
+                else if (typeof(System.Collections.IDictionary).IsAssignableFrom(Type))
+                {
+                    return TypeCodes.IDictionary;
+                }
+                else if (typeof(System.Data.Common.DbDataReader).IsAssignableFrom(Type))
+                {
+                    return TypeCodes.DbDataReader;
+                }
+                else if (typeof(System.Data.Common.DbParameter).IsAssignableFrom(Type))
+                {
+                    return TypeCodes.DbParameter;
+                }
+                else if (typeof(Type).IsAssignableFrom(Type))
+                {
+                    return TypeCodes.Type;
                 }
             }
             return (TypeCodes)TypeCode;
@@ -409,65 +422,112 @@ namespace blqw
                         return false;
                     };
                 case TypeCodes.Boolean:
-                    return CreateDelegate<Boolean>(Convert2.TryParseBoolean);
+                    return CreateDelegate<Boolean>(Convert2.TryParseBoolean, IsNullable);
                 case TypeCodes.Char:
-                    return CreateDelegate<Char>(Convert2.TryParseChar);
+                    return CreateDelegate<Char>(Convert2.TryParseChar, IsNullable);
                 case TypeCodes.SByte:
-                    return CreateDelegate<SByte>(Convert2.TryParseSByte);
+                    return CreateDelegate<SByte>(Convert2.TryParseSByte, IsNullable);
                 case TypeCodes.Byte:
-                    return CreateDelegate<Byte>(Convert2.TryParseByte);
+                    return CreateDelegate<Byte>(Convert2.TryParseByte, IsNullable);
                 case TypeCodes.Int16:
-                    return CreateDelegate<Int16>(Convert2.TryParseInt16);
+                    return CreateDelegate<Int16>(Convert2.TryParseInt16, IsNullable);
                 case TypeCodes.UInt16:
-                    return CreateDelegate<UInt16>(Convert2.TryParseUInt16);
+                    return CreateDelegate<UInt16>(Convert2.TryParseUInt16, IsNullable);
                 case TypeCodes.Int32:
-                    return CreateDelegate<Int32>(Convert2.TryParseInt32);
+                    return CreateDelegate<Int32>(Convert2.TryParseInt32, IsNullable);
                 case TypeCodes.UInt32:
-                    return CreateDelegate<UInt32>(Convert2.TryParseUInt32);
+                    return CreateDelegate<UInt32>(Convert2.TryParseUInt32, IsNullable);
                 case TypeCodes.Int64:
-                    return CreateDelegate<Int64>(Convert2.TryParseInt64);
+                    return CreateDelegate<Int64>(Convert2.TryParseInt64, IsNullable);
                 case TypeCodes.UInt64:
-                    return CreateDelegate<UInt64>(Convert2.TryParseUInt64);
+                    return CreateDelegate<UInt64>(Convert2.TryParseUInt64, IsNullable);
                 case TypeCodes.Single:
-                    return CreateDelegate<Single>(Convert2.TryParseSingle);
+                    return CreateDelegate<Single>(Convert2.TryParseSingle, IsNullable);
                 case TypeCodes.Double:
-                    return CreateDelegate<Double>(Convert2.TryParseDouble);
+                    return CreateDelegate<Double>(Convert2.TryParseDouble, IsNullable);
                 case TypeCodes.Decimal:
-                    return CreateDelegate<Decimal>(Convert2.TryParseDecimal);
+                    return CreateDelegate<Decimal>(Convert2.TryParseDecimal, IsNullable);
                 case TypeCodes.DateTime:
-                    return CreateDelegate<DateTime>(Convert2.TryParseDateTime);
+                    return CreateDelegate<DateTime>(Convert2.TryParseDateTime, IsNullable);
                 case TypeCodes.String:
-                    return CreateDelegate<String>(Convert2.TryParseString);
+                    return CreateDelegate<String>(Convert2.TryParseString, IsNullable);
                 case TypeCodes.Guid:
-                    return CreateDelegate<Guid>(Convert2.TryParseGuid);
+                    return CreateDelegate<Guid>(Convert2.TryParseGuid, IsNullable);
                 case TypeCodes.TimeSpan:
-                    return CreateDelegate<TimeSpan>(Convert2.TryParseTimeSpan);
+                    return CreateDelegate<TimeSpan>(Convert2.TryParseTimeSpan, IsNullable);
                 case TypeCodes.IntPtr:
-                    return CreateDelegate<IntPtr>(Convert2.TryParseIntPtr);
+                    return CreateDelegate<IntPtr>(Convert2.TryParseIntPtr, IsNullable);
                 case TypeCodes.UIntPtr:
-                    return CreateDelegate<UIntPtr>(Convert2.TryParseUIntPtr);
+                    return CreateDelegate<UIntPtr>(Convert2.TryParseUIntPtr, IsNullable);
                 case TypeCodes.Enum:
                     var type = IsNullable ? NullableUnderlyingType.Type : Type;
                     var parse = Convert2.TryParseEnumMethod.MakeGenericMethod(type);
-                    var create = this.GetType().GetMethod("CreateDelegate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+                    var create = this.GetType().GetMethod("CreateDelegate", BindingFlags.NonPublic | BindingFlags.Static);
                     create = create.MakeGenericMethod(type);
-                    return (LiteracyTryParse)create.Invoke(null, new object[] { Delegate.CreateDelegate(typeof(LiteracyTryParse<>).MakeGenericType(type), parse) });
+                    return (LiteracyTryParse)create.Invoke(null, new object[] { Delegate.CreateDelegate(typeof(LiteracyTryParse<>).MakeGenericType(type), parse), IsNullable });
                 default:
-                    type = IsNullable ? NullableUnderlyingType.Type : Type;
-                    return (object input, out object result) => {
-                        if (type.IsInstanceOfType(input))
-                        {
-                            result = input;
-                            return true;
-                        }
-                        result = null;
-                        return false;
-                    };
+                    if (IsNullable)
+                    {
+                        type = NullableUnderlyingType.Type;
+                        return (object input, out object result) => {
+                            if (input == null || input is DBNull)
+                            {
+                                result = null;
+                                return true;
+                            }
+                            else if (type.IsInstanceOfType(input))
+                            {
+                                result = input;
+                                return true;
+                            }
+                            result = null;
+                            return false;
+                        };
+                    }
+                    else
+                    {
+                        type = Type;
+                        return (object input, out object result) => {
+                            if (input == null || input is DBNull)
+                            {
+                                if (type.IsClass)
+                                {
+                                    result = null;
+                                    return true;
+                                }
+                            }
+                            else if (type.IsInstanceOfType(input))
+                            {
+                                result = input;
+                                return true;
+                            }
+                            result = null;
+                            return false;
+                        };
+                    }
             }
         }
 
-        private static LiteracyTryParse CreateDelegate<T>(LiteracyTryParse<T> tryParse)
+        private static LiteracyTryParse CreateDelegate<T>(LiteracyTryParse<T> tryParse, bool isnullable)
         {
+            if (isnullable)
+            {
+                return (object input, out object result) => {
+                    if (input == null || input is DBNull)
+                    {
+                        result = null;
+                        return true;
+                    }
+                    T t;
+                    if (tryParse(input, out t))
+                    {
+                        result = t;
+                        return true;
+                    }
+                    result = null;
+                    return false;
+                };
+            }
             return (object input, out object result) => {
                 T t;
                 if (tryParse(input, out t))
@@ -479,6 +539,7 @@ namespace blqw
                 return false;
             };
         }
+
 
         #endregion
 

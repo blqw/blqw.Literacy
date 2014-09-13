@@ -45,12 +45,13 @@ namespace blqw
             OriginalType = field.FieldType; //字段值类型
             Static = field.IsStatic; //字段是否是静态的
             IsPublic = field.IsPublic; //字段是否是公开的
-            CanWrite = !field.IsInitOnly; //是否可写取决于ReadOnly
+            CanWrite = field.IsLiteral; // !field.IsInitOnly; //是否可写取决于ReadOnly
             CanRead = true; //字段一定可以读
             Init();
             ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
             UID = Guid.NewGuid();
             TypeCodes = TypeInfo.TypeCodes;
+            AutoField = (field.Name[0] == '<') || field.Name.Contains("<");
         }
 
         #region 只读属性
@@ -176,7 +177,7 @@ namespace blqw
             {
                 if (Setter == PreSetter) //Setter未编译
                 {
-                    if (!CanWrite) //当前成员可读
+                    if (!CanWrite) //当前成员可写
                     {
                         Setter = ErrorSetter;
                     }
@@ -263,7 +264,7 @@ namespace blqw
         /// <param name="value">成功将值保存在value,失败返回null</param>
         public bool TryGetValue(object instance, out object value)
         {
-            if (!CanWrite)
+            if (!CanRead)
             {
                 value = null;
                 return false;
@@ -292,7 +293,7 @@ namespace blqw
         /// <exception cref="ArgumentNullException">实例属性instance对象不能为null</exception>
         public void SetValue(object instance, object value)
         {
-            if (!CanRead)
+            if (!CanWrite)
             {
                 ErrorSetter(null, null);
             }
@@ -393,5 +394,9 @@ namespace blqw
         /// <summary> 指定对象类型
         /// </summary>
         public readonly TypeCodes TypeCodes;
+
+        /// <summary> 是自动属性
+        /// </summary>
+        public readonly bool AutoField;
     }
 }

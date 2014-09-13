@@ -14,6 +14,60 @@ namespace blqw
 
         #region DbType
 
+        public static DbType TypeCodesToDbType(TypeCodes typeCodes)
+        {
+            switch (typeCodes)
+            {
+                case TypeCodes.Boolean:
+                    return DbType.Boolean;
+                case TypeCodes.Byte:
+                    return DbType.Byte;
+                case TypeCodes.Char:
+                    return DbType.Boolean;
+                case TypeCodes.DBNull:
+                    return DbType.Object;
+                case TypeCodes.DateTime:
+                    return DbType.DateTime;
+                case TypeCodes.Decimal:
+                    return DbType.Decimal;
+                case TypeCodes.Double:
+                    return DbType.Double;
+                case TypeCodes.Empty:
+                    return DbType.Object;
+                case TypeCodes.Int16:
+                    return DbType.Int16;
+                case TypeCodes.Int32:
+                    return DbType.Int32;
+                case TypeCodes.Int64:
+                    return DbType.Int64;
+                case TypeCodes.SByte:
+                    return DbType.SByte;
+                case TypeCodes.Single:
+                    return DbType.Single;
+                case TypeCodes.String:
+                    return DbType.String;
+                case TypeCodes.UInt16:
+                    return DbType.UInt16;
+                case TypeCodes.UInt32:
+                    return DbType.UInt32;
+                case TypeCodes.UInt64:
+                    return DbType.UInt64;
+                case TypeCodes.Guid:
+                    return DbType.Guid;
+                case TypeCodes.TimeSpan:
+                    return DbType.Time;
+                case TypeCodes.StringBuilder:
+                    return DbType.String;
+                case TypeCodes.Enum:
+                    return DbType.Int32;
+                case TypeCodes.Xml:
+                    return DbType.Xml;
+                default:
+                    break;
+            }
+            throw new InvalidCastException("无法将" + typeCodes.ToString() + "转换为DbType");
+        }
+
         public static DbType TypeToDbType(Type type)
         {
             switch (Type.GetTypeCode(type))
@@ -2271,7 +2325,7 @@ namespace blqw
             {
                 throw new ArgumentOutOfRangeException("T", "类型不是枚举");
             }
-            if (input is Enum)
+            if (input is T)
             {
                 result = (T)input;
                 return true;
@@ -2290,7 +2344,7 @@ namespace blqw
                 result = default(T);
                 return false;
             }
-            switch (Type.GetTypeCode(input.GetType()).GetTypeCode())
+            switch (Type.GetTypeCode(input.GetType()))
             {
                 case TypeCode.Empty:
                 case TypeCode.DBNull:
@@ -2299,24 +2353,25 @@ namespace blqw
                 case TypeCode.Boolean:
                     result = default(T);
                     return false;
-                case TypeCode.Byte: result = (T)input; return true;
-                case TypeCode.Char: result = (T)input; return true;
-                case TypeCode.Int16: result = (T)input; return true;
-                case TypeCode.Int32: result = (T)input; return true;
-                case TypeCode.Int64: result = (T)input; return true;
-                case TypeCode.SByte: result = (T)input; return true;
-                case TypeCode.Double: result = (T)input; return true;
-                case TypeCode.Single: result = (T)input; return true;
-                case TypeCode.UInt16: result = (T)input; return true;
-                case TypeCode.UInt32: result = (T)input; return true;
-                case TypeCode.UInt64: result = (T)input; return true;
+                case TypeCode.Byte:
+                case TypeCode.Char:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.SByte:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    result = (T)Convert.ChangeType(input, Enum.GetUnderlyingType(typeof(T))); return true;
                 default:
                     break;
             }
 #if NF2
-            return NF2EnumTryParse(input.ToString(), out result);
+            return NF2EnumTryParse(input + "", out result);
 #else
-            return Enum.TryParse<T>(input.ToString(),false, out result);
+            return Enum.TryParse<T>(input + "", false, out result);
 #endif
         }
         public static bool TryParseObject(object input, Type outputType, out object result)
@@ -2967,7 +3022,7 @@ namespace blqw
                 var p = props[i];
                 if (p != null)
                 {
-                    p.TrySetValue(model, p.TypeInfo.Convert(reader[i]));
+                    p.SetValue(model, p.TypeInfo.Convert(reader[i]));
                 }
             }
         }
@@ -2978,7 +3033,7 @@ namespace blqw
                 var p = props[i];
                 if (p != null)
                 {
-                    p.TrySetValue(model, p.TypeInfo.Convert(row[i]));
+                    p.SetValue(model, p.TypeInfo.Convert(row[i]));
                 }
             }
         }
