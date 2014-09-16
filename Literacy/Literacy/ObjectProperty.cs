@@ -45,7 +45,7 @@ namespace blqw
             OriginalType = field.FieldType; //字段值类型
             Static = field.IsStatic; //字段是否是静态的
             IsPublic = field.IsPublic; //字段是否是公开的
-            CanWrite = field.IsLiteral; // !field.IsInitOnly; //是否可写取决于ReadOnly
+            CanWrite = !field.IsLiteral; // !field.IsInitOnly; //是否可写取决于ReadOnly
             CanRead = true; //字段一定可以读
             Init();
             ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
