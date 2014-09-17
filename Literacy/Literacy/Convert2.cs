@@ -182,7 +182,7 @@ namespace blqw
         #endregion
 
         #region ToType
-        public static bool ToBoolean(object input, bool defaultValue = default(bool), bool throwOnError = false)
+        public static bool ToBoolean(object input, bool defaultValue = default(bool), bool throwOnError = true)
         {
             bool value;
             if (TryParseBoolean(input, out value))
@@ -193,7 +193,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static byte ToByte(object input, byte defaultValue = default(byte), bool throwOnError = false)
+        public static byte ToByte(object input, byte defaultValue = default(byte), bool throwOnError = true)
         {
             byte value;
             if (TryParseByte(input, out value))
@@ -204,7 +204,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static char ToChar(object input, char defaultValue = default(char), bool throwOnError = false)
+        public static char ToChar(object input, char defaultValue = default(char), bool throwOnError = true)
         {
             char value;
             if (TryParseChar(input, out value))
@@ -215,7 +215,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static DateTime ToDateTime(object input, DateTime defaultValue = default(DateTime), bool throwOnError = false)
+        public static DateTime ToDateTime(object input, DateTime defaultValue = default(DateTime), bool throwOnError = true)
         {
             DateTime value;
             if (TryParseDateTime(input, out value))
@@ -226,7 +226,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static TimeSpan ToTimeSpan(object input, TimeSpan defaultValue = default(TimeSpan), bool throwOnError = false)
+        public static TimeSpan ToTimeSpan(object input, TimeSpan defaultValue = default(TimeSpan), bool throwOnError = true)
         {
             TimeSpan value;
             if (TryParseTimeSpan(input, out value))
@@ -237,7 +237,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static decimal ToDecimal(object input, decimal defaultValue = default(decimal), bool throwOnError = false)
+        public static decimal ToDecimal(object input, decimal defaultValue = default(decimal), bool throwOnError = true)
         {
             decimal value;
             if (TryParseDecimal(input, out value))
@@ -248,7 +248,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static double ToDouble(object input, double defaultValue = default(double), bool throwOnError = false)
+        public static double ToDouble(object input, double defaultValue = default(double), bool throwOnError = true)
         {
             double value;
             if (TryParseDouble(input, out value))
@@ -259,7 +259,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static Guid ToGuid(object input, Guid defaultValue = default(Guid), bool throwOnError = false)
+        public static Guid ToGuid(object input, Guid defaultValue = default(Guid), bool throwOnError = true)
         {
             Guid value;
             if (TryParseGuid(input, out value))
@@ -270,7 +270,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static byte[] ToBytes(object input, byte[] defaultValue = default(byte[]), bool throwOnError = false)
+        public static byte[] ToBytes(object input, byte[] defaultValue = default(byte[]), bool throwOnError = true)
         {
             byte[] value;
             if (TryParseBytes(input, out value))
@@ -281,7 +281,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static short ToInt16(object input, short defaultValue = default(short), bool throwOnError = false)
+        public static short ToInt16(object input, short defaultValue = default(short), bool throwOnError = true)
         {
             short value;
             if (TryParseInt16(input, out value))
@@ -292,7 +292,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static int ToInt32(object input, int defaultValue = default(int), bool throwOnError = false)
+        public static int ToInt32(object input, int defaultValue = default(int), bool throwOnError = true)
         {
             int value;
             if (TryParseInt32(input, out value))
@@ -303,7 +303,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static long ToInt64(object input, long defaultValue = default(long), bool throwOnError = false)
+        public static long ToInt64(object input, long defaultValue = default(long), bool throwOnError = true)
         {
             long value;
             if (TryParseInt64(input, out value))
@@ -314,7 +314,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static sbyte ToSByte(object input, sbyte defaultValue = default(sbyte), bool throwOnError = false)
+        public static sbyte ToSByte(object input, sbyte defaultValue = default(sbyte), bool throwOnError = true)
         {
             sbyte value;
             if (TryParseSByte(input, out value))
@@ -325,7 +325,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static float ToSingle(object input, float defaultValue = default(float), bool throwOnError = false)
+        public static float ToSingle(object input, float defaultValue = default(float), bool throwOnError = true)
         {
             float value;
             if (TryParseSingle(input, out value))
@@ -336,7 +336,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static ushort ToUInt16(object input, ushort defaultValue = default(ushort), bool throwOnError = false)
+        public static ushort ToUInt16(object input, ushort defaultValue = default(ushort), bool throwOnError = true)
         {
             ushort value;
             if (TryParseUInt16(input, out value))
@@ -347,7 +347,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static uint ToUInt32(object input, uint defaultValue = default(uint), bool throwOnError = false)
+        public static uint ToUInt32(object input, uint defaultValue = default(uint), bool throwOnError = true)
         {
             uint value;
             if (TryParseUInt32(input, out value))
@@ -358,7 +358,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static ulong ToUInt64(object input, ulong defaultValue = default(ulong), bool throwOnError = false)
+        public static ulong ToUInt64(object input, ulong defaultValue = default(ulong), bool throwOnError = true)
         {
             ulong value;
             if (TryParseUInt64(input, out value))
@@ -369,7 +369,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static string ToString(object input, string defaultValue = null, bool throwOnError = false)
+        public static string ToString(object input, string defaultValue = null, bool throwOnError = true)
         {
             if (TryParseString(input, out defaultValue))
             {
@@ -380,7 +380,7 @@ namespace blqw
                 return input.ToString();
             }
         }
-        public static TEnum ToEnum<TEnum>(object input, TEnum defaultValue, bool throwOnError = false)
+        public static TEnum ToEnum<TEnum>(object input, TEnum defaultValue, bool throwOnError = true)
                 where TEnum : struct, IComparable, IFormattable, IConvertible
         {
             TEnum value;
@@ -392,7 +392,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static Enum ToEnum(object input, Enum defaultValue, bool throwOnError = false)
+        public static Enum ToEnum(object input, Enum defaultValue, bool throwOnError = true)
         {
             Enum value;
             if (TryParseEnum(input, defaultValue.GetType(), out value))
@@ -403,7 +403,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static T ToObject<T>(object input, T defaultValue = default(T), bool throwOnError = false)
+        public static T ToObject<T>(object input, T defaultValue = default(T), bool throwOnError = true)
         {
             T value;
             if (GenericCache<T>.TryParse(input, out value))
@@ -414,7 +414,7 @@ namespace blqw
                 ThrowError(input, defaultValue);
             return defaultValue;
         }
-        public static object ChangedType(object input, Type outputType, object defaultValue = null, bool throwOnError = false)
+        public static object ChangedType(object input, Type outputType, object defaultValue = null, bool throwOnError = true)
         {
             object value;
             if (TryParseObject(input, outputType, out value))
