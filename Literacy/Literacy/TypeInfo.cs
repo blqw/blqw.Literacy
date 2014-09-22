@@ -218,8 +218,8 @@ namespace blqw
             }
         }
 
-        private LiteracyTryParse _tryParse;
-
+        /// <summary> 数据类型转换,失败返回false
+        /// </summary>
         public LiteracyTryParse TryParse
         {
             get
@@ -232,6 +232,9 @@ namespace blqw
             }
         }
 
+        /// <summary> 数据类型转换,失败抛出异常
+        /// </summary>
+        /// <param name="input">等待转换的数据</param>
         public object Convert(object input)
         {
             object value;
@@ -243,6 +246,8 @@ namespace blqw
         }
 
         #region 私有方法
+
+        private LiteracyTryParse _tryParse;
 
         /// <summary> 获取当前类型的 TypeCodes 值
         /// </summary>

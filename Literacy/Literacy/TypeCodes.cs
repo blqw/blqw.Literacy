@@ -4,7 +4,7 @@ using System.Text;
 
 namespace blqw
 {
-    /// <summary> 指定对象的类型。兼容System.TypeCode,并提供更多
+    /// <summary> 指定对象的类型。
     /// </summary>
     [Serializable]
     public enum TypeCodes
@@ -38,8 +38,8 @@ namespace blqw
         StringBuilder = 223,
         IListT = 225,
         IDictionaryT = 226,
-        [Obsolete("已弃用",true)]
-        IEnumerable = 227,
+        //[Obsolete("已弃用",true)]
+        //IEnumerable = 227,
         DbDataReader = 228,
         DataSet = 229,
         DataTable = 230,

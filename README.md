@@ -4,10 +4,15 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 在我的其他项目中,几乎都引用了这个项目,如 [blqw.Json](https://code.csdn.net/jy02305022/blqw-json), [blqw.Ajax2](https://code.csdn.net/jy02305022/blqw-ajax2), [blqw.FQL](https://code.csdn.net/jy02305022/blqw-fql) 等  
 
 ## 特色
-### 快
-就是快
+### 全,易,快
+功能强大  
+上手简单  
+性能优异  
 
 ## 更新说明  
+#### 2014.09.22  
+* 正式版发布
+
 #### 2014.09.14  
 * 修正Convert2枚举类型转换中的bug
 * 修正Convert2可空值类型转换中的bug
@@ -27,11 +32,11 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 * 增加静态类 TypesHelper, 存放用于处理Type对象的静态方法  
 * 增加密封类 TypeInfo, 用于拓展系统Type对象的属性和方法  
 * 修改Literacy类中的缓存,将操作转移至TypesHelper  
-* 修改TypeCodes的计算方法,将操作转移至TypeInfo
+* 修改TypeCodes的计算方法,将操作转移至TypeInfo  
   
 #### 2014.07.30  
 * 为Literacy和ObjectProperty实体增加ID(自增标识,2个类共享自增序列)和UID(全球唯一标识符GUID)方便在做缓存的时候作为key使用  
-* 增加TypeCodes枚举,用于扩展系统的TypeCode 会稍微影响构造Literacy的速度,但是由于Literacy本身是全局缓存,所以影响不大
+* 增加TypeCodes枚举,用于扩展系统的TypeCode 会稍微影响构造Literacy的速度,但是由于Literacy本身是全局缓存,所以影响不大  
   
 #### 2014.07.29  
 * 增加对特性的支持,现在可以从 Literacy 或 Literacy.Property 或 Literacy.Field 直接使用Attributes属性访问  

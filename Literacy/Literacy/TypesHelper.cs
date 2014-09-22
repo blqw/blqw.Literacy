@@ -13,17 +13,7 @@ namespace blqw
             public readonly static TypeInfo TypeInfo = GetTypeInfo(typeof(T));
         }
 
-        private static readonly Dictionary<Type, TypeInfo> Cache = CreateCache();
-
-        private static Dictionary<Type, TypeInfo> CreateCache()
-        {
-            var count = 0;
-            foreach (var ass in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                count += ass.GetTypes().Length;
-            }
-            return new Dictionary<Type, TypeInfo>(count);
-        }
+        private static readonly Dictionary<Type, TypeInfo> Cache = new Dictionary<Type, TypeInfo>();
 
         /// <summary> 获取TypeInfo对象
         /// </summary>
@@ -49,17 +39,18 @@ Type type)
             {
                 return null;
             }
+            var key = type;
             TypeInfo info;
-            if (Cache.TryGetValue(type, out info))
+            if (Cache.TryGetValue(key, out info))
             {
                 return info;
             }
             lock (Cache)
             {
-                if (Cache.TryGetValue(type, out info) == false)
+                if (Cache.TryGetValue(key, out info) == false)
                 {
                     info = new TypeInfo(type);
-                    Cache.Add(type, info);
+                    Cache.Add(key, info);
                 }
                 return info;
             }
