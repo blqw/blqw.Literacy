@@ -122,7 +122,7 @@ namespace blqw
             {
                 return DbType.Xml;
             }
-            throw new InvalidCastException("无法将" + TypesHelper.DisplayName(type) + "转换为DbType");
+            return DbType.Object;
         }
 
         public static Type DbTypeToType(DbType dbtype)
@@ -2706,27 +2706,38 @@ namespace blqw
         }
         private static bool StringToGuid(string input, out Guid value)
         {
-            if (input == null)
+            if (input == null || input.Length == 0)
             {
                 value = Guid.Empty;
                 return false;
             }
-            if (input.Length > 30)
+
+#if !NF2
+            if (Guid.TryParse(input, out value))
             {
-#if NF2
+                return true;
+            }
+#else
+            var l = input.Length;
+            var a = input[0];
+            var b = input[l - 1];
+            if (a == ' ' || b == ' ')
+            {
+                input = input.Trim();
+                a = input[0];
+                b = input[l - 1];
+            }
+
+            if ((a == '{' && b == '}') || l == 32 || l == 36)
+            {
                 try
                 {
                     value = new Guid(input);
                     return true;
                 }
                 catch { }
-#else
-                if (Guid.TryParse(input, out value))
-                {
-                    return true;
-                }
-#endif
             }
+#endif
             else
             {
                 try

@@ -10,6 +10,9 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 性能优异  
 
 ## 更新说明  
+#### 2014.10.10
+* 日常维护,优化了StringToGuid的逻辑,优化性能
+
 #### 2014.09.22  
 * 正式版发布
 
