@@ -428,7 +428,21 @@ namespace blqw
 
         private static void ThrowError<T>(object input, T value)
         {
-            throw new InvalidCastException(string.Concat("值 '", ((object)input ?? "<NULL>").ToString(), "' 无法转为 ", TypesHelper.DisplayName(typeof(T)), " 类型"));
+            string x;
+            if (input == null)
+            {
+                x = "<null>";
+            }
+            else if (input is DBNull)
+            {
+                x = "<DBNull>";
+            }
+            else
+            {
+                x = input.ToString();
+            }
+            var name = TypesHelper.GetTypeInfo<T>().DisplayName;
+            throw new InvalidCastException(string.Concat("值 '", x, "' 无法转为 ", name, " 类型"));
         }
         #endregion
 
@@ -3002,10 +3016,11 @@ namespace blqw
             var props = new ObjectProperty[length];
             for (int i = 0; i < length; i++)
             {
-                var p = lit.Property[cols[i].ColumnName.Replace("_", "")];
-                if (p == null)
+                var name = cols[i].ColumnName;
+                var p = lit.Property[name.Replace("_", "")] ?? lit.Property[name];
+                if (p != null && p.CanWrite)
                 {
-                    p = lit.Property[cols[i].ColumnName];
+                    props[i] = p;
                 }
                 props[i] = p;
             }
@@ -3017,12 +3032,12 @@ namespace blqw
             var props = new ObjectProperty[length];
             for (int i = 0; i < length; i++)
             {
-                var p = lit.Property[reader.GetName(i).Replace("_", "")];
-                if (p == null)
+                var name = reader.GetName(i);
+                var p = lit.Property[name.Replace("_", "")] ?? lit.Property[name];
+                if (p != null && p.CanWrite)
                 {
-                    p = lit.Property[reader.GetName(i)];
+                    props[i] = p;
                 }
-                props[i] = p;
             }
             return props;
         }
