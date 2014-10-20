@@ -47,9 +47,9 @@
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Literacy\Literacy.csproj">
+    <ProjectReference Include="..\Literacy\blqw.Literacy.csproj">
       <Project>{d0c3b619-180a-407b-be4a-9c1864b2a06d}</Project>
-      <Name>Literacy</Name>
+      <Name>blqw.Literacy</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
