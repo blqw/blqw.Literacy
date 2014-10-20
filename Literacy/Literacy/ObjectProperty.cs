@@ -10,7 +10,7 @@ namespace blqw
         /// <summary> 表示一个可以获取或者设置其内容的对象属性
         /// </summary>
         /// <param name="property">属性信息</param>
-        internal ObjectProperty(PropertyInfo property)
+        public ObjectProperty(PropertyInfo property)
         {
             Field = false;
             MemberInfo = property; //属性信息
@@ -38,7 +38,7 @@ namespace blqw
         /// <summary> 表示一个可以获取或者设置其内容的对象字段
         /// </summary>
         /// <param name="field">字段信息</param>
-        internal ObjectProperty(FieldInfo field)
+        public ObjectProperty(FieldInfo field)
         {
             Field = true; //是一个字段
             MemberInfo = field; //字段信息
