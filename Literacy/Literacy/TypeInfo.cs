@@ -261,30 +261,35 @@ namespace blqw
             {
                 return blqw.TypeCodes.Enum;
             }
-            if (IsMakeGenericType) //泛型类型
+            if (IsMakeGenericType && Type.Name.StartsWith("<>f__AnonymousType")) //判断匿名类
             {
-                if (Type.Name.StartsWith("<>f__AnonymousType"))//判断匿名类
-                {
-                    return TypeCodes.AnonymousType;
-                }
+                return TypeCodes.AnonymousType;
+            }
 
-                var args = Type.GetGenericArguments();
-                switch (args.Length)
+            var interfaces =  Type.GetInterfaces();
+            var length = interfaces.Length;
+            for (int i = 0; i < length; i++)
+            {
+                var inf = interfaces[i];
+                if (inf.IsGenericTypeDefinition)
                 {
-                    case 1:
-                        if (typeof(IList<>).MakeGenericType(args).IsAssignableFrom(Type))
-                        {
-                            return TypeCodes.IListT;
-                        }
-                        break;
-                    case 2:
-                        if (typeof(IDictionary<,>).MakeGenericType(args).IsAssignableFrom(Type))
-                        {
-                            return TypeCodes.IDictionaryT;
-                        }
-                        break;
-                    default:
-                        break;
+                    
+                }
+                else if (inf.IsGenericType)
+                {
+                    inf = inf.GetGenericTypeDefinition();
+                }
+                else
+                {
+                    continue;
+                }
+                if (inf == typeof(IList<>))
+                {
+                    return TypeCodes.IListT;
+                }
+                else if (inf == typeof(IDictionary<,>))
+                {
+                    return TypeCodes.IDictionaryT;
                 }
             }
 
