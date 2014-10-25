@@ -426,13 +426,13 @@ namespace blqw
 
         /// <summary> IL构造一个用于获取对象属性值的委托
         /// </summary>
-        public static LiteracyGetter CreateGetter(PropertyInfo prop)
+        public static LiteracyGetter CreateGetter(PropertyInfo prop, Type owner = null)
         {
             if (prop == null)
             {
                 return null;
             }
-            var dm = new DynamicMethod("", TypeObject, TypesObject, prop.ReflectedType, true);
+            var dm = new DynamicMethod("", TypeObject, TypesObject, owner ?? prop.ReflectedType, true);
             var il = dm.GetILGenerator();
             var met = prop.GetGetMethod(true);
             if (met == null)
@@ -466,13 +466,13 @@ namespace blqw
 
         /// <summary> IL构造一个用于获取对象字段值的委托
         /// </summary>
-        public static LiteracyGetter CreateGetter(FieldInfo field)
+        public static LiteracyGetter CreateGetter(FieldInfo field, Type owner = null)
         {
             if (field == null)
             {
                 return null;
             }
-            var dm = new DynamicMethod("", TypeObject, TypesObject, field.ReflectedType, true);
+            var dm = new DynamicMethod("", TypeObject, TypesObject, owner ?? field.ReflectedType, true);
             var il = dm.GetILGenerator();
             if (field.IsStatic)
             {
@@ -494,7 +494,7 @@ namespace blqw
 
         /// <summary> IL构造一个用于设置对象属性值的委托
         /// </summary>
-        public static LiteracySetter CreateSetter(PropertyInfo prop)
+        public static LiteracySetter CreateSetter(PropertyInfo prop, Type owner = null)
         {
             if (prop == null)
             {
@@ -504,7 +504,7 @@ namespace blqw
             {
                 throw new NotSupportedException("不支持值类型成员的赋值操作");
             }
-            var dm = new DynamicMethod("", null, Types2Object, prop.ReflectedType, true);
+            var dm = new DynamicMethod("", null, Types2Object, owner ?? prop.ReflectedType, true);
             var set = prop.GetSetMethod(true);
             if (set == null)
             {
@@ -533,7 +533,7 @@ namespace blqw
 
         /// <summary> IL构造一个用于设置对象字段值的委托
         /// </summary>
-        public static LiteracySetter CreateSetter(FieldInfo field)
+        public static LiteracySetter CreateSetter(FieldInfo field, Type owner = null)
         {
             if (field == null || field.IsLiteral)
             {
@@ -543,7 +543,7 @@ namespace blqw
             {
                 return null;
             }
-            var dm = new DynamicMethod("", null, Types2Object, field.ReflectedType, true);
+            var dm = new DynamicMethod("", null, Types2Object, owner ?? field.ReflectedType, true);
             var il = dm.GetILGenerator();
 
             if (field.IsStatic)
@@ -567,14 +567,14 @@ namespace blqw
         /// <summary> IL构造一个用于执行方法的委托
         /// </summary>
         /// <param name="method">方法</param>
-        public static LiteracyCaller CreateCaller(MethodInfo method)
+        public static LiteracyCaller CreateCaller(MethodInfo method, Type owner = null)
         {
             if (method == null)
             {
                 return null;
             }
 
-            var dm = new DynamicMethod("", TypeObject, TypesObjectObjects, method.ReflectedType, true);
+            var dm = new DynamicMethod("", TypeObject, TypesObjectObjects, owner ?? method.DeclaringType, true);
 
             var il = dm.GetILGenerator();
 
