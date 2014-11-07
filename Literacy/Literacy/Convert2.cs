@@ -2137,7 +2137,7 @@ namespace blqw
             var bs = input as byte[];
             if (bs != null)
             {
-                if (bs.Length != 16)
+                if (bs.Length == 16)
                 {
                     result = new Guid(bs);
                     return true;
