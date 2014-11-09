@@ -261,6 +261,10 @@ namespace blqw
             {
                 return blqw.TypeCodes.Enum;
             }
+            if (Type.IsArray)
+            {
+                return blqw.TypeCodes.IList;
+            }
             if (IsMakeGenericType && Type.Name.StartsWith("<>f__AnonymousType")) //判断匿名类
             {
                 return TypeCodes.AnonymousType;
