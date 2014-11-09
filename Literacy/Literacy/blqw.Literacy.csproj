@@ -7,7 +7,7 @@
     <ProjectGuid>{D0C3B619-180A-407B-BE4A-9C1864B2A06D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>blqw.Literacy</RootNamespace>
+    <RootNamespace>blqw</RootNamespace>
     <AssemblyName>blqw.Literacy</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

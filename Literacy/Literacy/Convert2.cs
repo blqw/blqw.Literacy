@@ -2884,14 +2884,17 @@ namespace blqw
         {
             AreNull(reader, "reader");
             T model = default(T);
-            FillEntity(reader, ref model);
+            if (reader.Read() == false)
+            {
+                FillEntity(reader, ref model);
+            }
             return model;
         }
 
         public static bool FillEntity<T>(DbDataReader reader, ref T model)
         {
             AreNull(reader, "reader");
-            if (reader.Read() == false)
+            if (reader.IsClosed)
             {
                 return false;
             }
