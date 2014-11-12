@@ -9,6 +9,67 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 上手简单  
 性能优异  
 
+
+## 与反射的性能比较
+MethodInfo 循环 1000000 次
+ 运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )
+ 209ms       413,287,378              0        0        0
+
+Literacy 循环 1000000 次
+ 运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )
+ 52ms        103,657,391              0        0        0
+
+dynamic 循环 1000000 次
+ 运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )
+ 46ms        92,546,226               0        0        0
+
+请按任意键继续. . .
+
+#### 比较代码
+'*' 在2.0下没有dynamic时是个不错的选择
+'#' 即使在有dynamic时,Literacy依然有自己的优势,比如可以判断属性是否存在,可以操作私有字段,私有方法等
+```csharp
+static void Main(string[] args)
+{
+    User u = new User();
+    CodeTimer.Initialize();
+    CodeTimer.Time("MethodInfo", 1000000, () => GetName2(u));
+    CodeTimer.Time("Literacy", 1000000, () => GetName(u));
+    CodeTimer.Time("dynamic", 1000000, () => GetName3(u));
+}
+
+static ObjectProperty prop;
+
+public static object GetName(object obj)
+{
+    if (obj == null) throw new ArgumentNullException("obj");
+    if (prop == null)
+    {
+        prop = new Literacy(obj.GetType()).Property["Name"];
+        if (prop == null) throw new NotSupportedException("对象不包含Name属性");
+    }
+    return prop.GetValue(obj);
+}
+
+static MethodInfo getName;
+
+public static object GetName2(object obj)
+{
+    if (obj == null) throw new ArgumentNullException("obj");
+    if (getName == null)
+    {
+        getName = typeof(User).GetProperty("Name").GetGetMethod();
+    }
+    return getName.Invoke(obj, null); //缓存了反射Name属性
+}
+
+public static object GetName3(object obj)
+{
+    if (obj == null) throw new ArgumentNullException("obj");
+    return ((dynamic)obj).Name;
+}
+```
+
 ## 更新说明  
 #### 2014.10.10
 * 日常维护,优化了StringToGuid的逻辑,优化性能

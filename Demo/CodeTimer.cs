@@ -5,20 +5,13 @@ using System.Threading;
 
 namespace blqw
 {
-    /// <summary> 代码性能测试类,改编自'老赵'的同名类
-    /// </summary>
     public static class CodeTimer
     {
-        private static bool _initialize = false;
         public static void Initialize()
         {
-            if (_initialize == false)
-            {
-                Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
-                Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                Time("", 1, () => { });
-                _initialize = true;
-            }
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+            Time("", 1, () => { });
         }
 
         public static void Time(string name, int iteration, ThreadStart action)
@@ -28,7 +21,7 @@ namespace blqw
             // 1.
             ConsoleColor currentForeColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(name);
+            Console.WriteLine(name + " 循环 " + iteration + " 次");
 
             // 2.
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
@@ -50,13 +43,14 @@ namespace blqw
             // 4.
             Console.ForegroundColor = currentForeColor;
             Console.WriteLine(" 运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )");
-            format = " {0,-12}{1,-25}{2,-9}{3,-9}{4}";
+            format = " {0,-12}{1,-15}{2,-10}{3,-9}{4,-9}{5}";
             object[] args = new object[6];
             args[0] = watch.ElapsedMilliseconds.ToString("N0") + "ms";
             args[1] = cpuCycles.ToString("N0");
-            if (GC.MaxGeneration >= 0) args[2] = GC.CollectionCount(0) - gcCounts[0];
-            if (GC.MaxGeneration >= 1) args[3] = GC.CollectionCount(1) - gcCounts[1];
-            if (GC.MaxGeneration >= 2) args[4] = GC.CollectionCount(2) - gcCounts[2];
+            args[2] = "";
+            if (GC.MaxGeneration >= 0) args[3] = GC.CollectionCount(0) - gcCounts[0];
+            if (GC.MaxGeneration >= 1) args[4] = GC.CollectionCount(1) - gcCounts[1];
+            if (GC.MaxGeneration >= 2) args[5] = GC.CollectionCount(2) - gcCounts[2];
             Console.WriteLine(format, args);
             Console.WriteLine();
         }
@@ -75,4 +69,5 @@ namespace blqw
             return cycleCount;
         }
     }
+
 }
