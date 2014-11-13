@@ -24,8 +24,8 @@ http://www.cnblogs.com/blqw/p/Literacy.html
     46ms        92,546,226               0        0        0     
 
 #### 比较代码
-'*' 在2.0下没有dynamic时是个不错的选择   
-'*' 即使在有dynamic时,Literacy依然有自己的优势,比如可以判断属性是否存在,可以操作私有字段,私有方法等   
+`*` 在2.0下没有dynamic时是个不错的选择   
+`*` 即使在有dynamic时,Literacy依然有自己的优势,比如可以判断属性是否存在,可以操作私有字段,私有方法等   
 
     static void Main(string[] args)
     {
