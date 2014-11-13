@@ -56,7 +56,7 @@ http://www.cnblogs.com/blqw/p/Literacy.html
         if (obj == null) throw new ArgumentNullException("obj");
         if (getName == null)
         {
-            getName = typeof(User).GetProperty("Name").GetGetMethod();
+            getName = obj.GetType().GetProperty("Name").GetGetMethod();
         }
         return getName.Invoke(obj, null); //缓存了反射Name属性
     }
