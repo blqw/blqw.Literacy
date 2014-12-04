@@ -56,27 +56,49 @@ namespace blqw
                 return null;
             }
         }
+
+        /// <summary> 使用映射名获取字段
+        /// </summary>
+        /// <param name="mappingName"></param>
+        public ObjectProperty Mapping(string mappingName)
+        {
+            ObjectProperty value;
+            if (_Items.TryGetValue("\0" + mappingName, out value))
+            {
+                return value;
+            }
+            return null;
+        }
+
         /// <summary> 属性个数
         /// </summary>
-        public int Count
-        {
-            get { return _Items.Count; }
-        }
+        public int Count { get; private set; }
 
         internal void Add(ObjectProperty value)
         {
             var name = value.Name;
-            if (IgnoreCase)
+            ObjectProperty p;
+            if (_Items.TryGetValue(name, out p))
             {
-                if (_Items.ContainsKey(name))
+                if (IgnoreCase && p.Name != name)
                 {
-                    if (_Items[name].Name != name)
-                    {
-                        throw new ArgumentException("属性名称因忽略大小写而重复");
-                    }
+                    throw new ArgumentException("属性名称因忽略大小写而重复");
+                }
+                else
+                {
+                    throw new ArgumentException("属性不应重复添加");
                 }
             }
-            _Items[name] = value;
+            else
+            {
+                _Items.Add(name, value);
+                var mapping = value.Attributes.First<IMemberMappingAttributre>(); //获取映射名称
+                if (mapping != null)
+                {
+                    _Items.Add("\0" + mapping.Name, value);
+                }
+                Count++;
+            }
         }
 
         /// <summary> 支持在属性或字段集合上进行简单迭代。
@@ -84,11 +106,13 @@ namespace blqw
         /// <returns></returns>
         public IEnumerator<ObjectProperty> GetEnumerator()
         {
-            foreach (var item in _Items.Values)
+            foreach (var item in _Items)
             {
-                if (item.AutoField == false)
+                if (item.Key[0] == '\0') continue; //跳过映射属性
+                var value = item.Value;
+                if (value.AutoField == false)
                 {
-                    yield return item;
+                    yield return value;
                 }
             }
         }
@@ -100,33 +124,39 @@ namespace blqw
         {
             if (canwirte == null && canread == null)
             {
-                foreach (var item in _Items.Values)
+                foreach (var item in _Items)
                 {
-                    if (item.AutoField == false)
+                    if (item.Key[0] == '\0') continue;
+                    var value = item.Value;
+                    if (value.AutoField == false)
                     {
-                        yield return item;
+                        yield return value;
                     }
                 }
             }
             else if (canwirte == null)
             {
                 var b = canread.Value;
-                foreach (var item in _Items.Values)
+                foreach (var item in _Items)
                 {
-                    if (item.CanRead == b && item.AutoField == false)
+                    if (item.Key[0] == '\0') continue;
+                    var value = item.Value;
+                    if (value.CanRead == b && value.AutoField == false)
                     {
-                        yield return item;
+                        yield return value;
                     }
                 }
             }
             else if (canread == null)
             {
                 var b = canwirte.Value;
-                foreach (var item in _Items.Values)
+                foreach (var item in _Items)
                 {
-                    if (item.CanWrite == b && item.AutoField == false)
+                    if (item.Key[0] == '\0') continue;
+                    var value = item.Value;
+                    if (value.CanWrite == b && value.AutoField == false)
                     {
-                        yield return item;
+                        yield return value;
                     }
                 }
             }
@@ -134,11 +164,13 @@ namespace blqw
             {
                 var a = canread.Value;
                 var b = canwirte.Value;
-                foreach (var item in _Items.Values)
+                foreach (var item in _Items)
                 {
-                    if (item.CanWrite == b && item.CanRead == a && item.AutoField == false)
+                    if (item.Key[0] == '\0') continue;
+                    var value = item.Value;
+                    if (value.CanWrite == b && value.CanRead == a && value.AutoField == false)
                     {
-                        yield return item;
+                        yield return value;
                     }
                 }
             }

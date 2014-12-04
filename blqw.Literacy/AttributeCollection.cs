@@ -70,7 +70,7 @@ namespace blqw
         /// <summary> 获取第一个指定类型的特性,没有找到返回null
         /// </summary>
         public T First<T>()
-            where T : Attribute
+            where T : class
         {
             for (int i = 0; i < _count; i++)
             {
@@ -86,7 +86,7 @@ namespace blqw
         /// <summary> 获取第一个指定类型且符合条件的特性,,没有找到返回null
         /// </summary>
         public T First<T>(Converter<T, bool> func)
-            where T : Attribute
+            where T : class
         {
             if (func == null)
             {

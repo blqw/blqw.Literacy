@@ -69,6 +69,9 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 
 
 ## 更新说明  
+#### 2014.12.04
+* 增加接口 `IMemberMappingAttributre` 用于控制对象成员名称的映射关系,对象成员特性如果实现该接口,则`Convert2`中转换实体的方法优先考虑映射名称
+
 #### 2014.10.10
 * 日常维护,优化了StringToGuid的逻辑,优化性能
 
