@@ -34,7 +34,7 @@ namespace blqw
             Init();
             TypeCodes = TypeInfo.TypeCodes;
             Attributes = new AttributeCollection(MemberInfo);
-            var mapping = Attributes.First<IMemberMappingAttributre>();
+            var mapping = Attributes.First<IMemberMappingAttribute>();
             if (mapping != null)
             {
                 MappingName = mapping.Name;
@@ -59,7 +59,7 @@ namespace blqw
             TypeCodes = TypeInfo.TypeCodes;
             AutoField = (field.Name[0] == '<') || field.Name.Contains("<");
             Attributes = new AttributeCollection(MemberInfo);
-            var mapping = Attributes.First<IMemberMappingAttributre>();
+            var mapping = Attributes.First<IMemberMappingAttribute>();
             if (mapping != null)
             {
                 MappingName = mapping.Name;

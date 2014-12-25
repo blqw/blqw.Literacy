@@ -42,8 +42,9 @@
     <Compile Include="Convert2.cs" />
     <Compile Include="Delegate.cs" />
     <Compile Include="ILoadMember.cs" />
-    <Compile Include="IMemberMappingAttributre.cs" />
+    <Compile Include="IMemberMappingAttribute.cs" />
     <Compile Include="Literacy.cs" />
+    <Compile Include="MemberMappingAttribute.cs" />
     <Compile Include="ObjectProperty.cs" />
     <Compile Include="ObjectPropertyCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
