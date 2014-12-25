@@ -9,16 +9,33 @@ namespace Demo
 {
     class Program
     {
+        public class User2
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public DateTime? Birthday { get; set; }
+            public bool Sex { get; set; }
+        }
         static void Main(string[] args)
         {
+            var user2 = new User2 {
+                ID = 1,
+                Name = "aaa",
+                Sex = true,
+                Birthday = DateTime.Now
+            };
+
+            var user = Convert2.ToEntity<User>(user2, false);
+
+
             //SystemReflection(100000);
             //SystemReflection_Fast(100000);
             //LiteracyGetSet(100000);
-            User u = new User();
-            CodeTimer.Initialize();
-            CodeTimer.Time("MethodInfo", 1000000, () => GetName2(u));
-            CodeTimer.Time("Literacy", 1000000, () => GetName(u));
-            CodeTimer.Time("dynamic", 1000000, () => GetName3(u));
+            //User u = new User();
+            //CodeTimer.Initialize();
+            //CodeTimer.Time("MethodInfo", 1000000, () => GetName2(u));
+            //CodeTimer.Time("Literacy", 1000000, () => GetName(u));
+            //CodeTimer.Time("dynamic", 1000000, () => GetName3(u));
         }
 
         static ObjectProperty prop;

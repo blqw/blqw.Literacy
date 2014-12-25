@@ -33,7 +33,8 @@ namespace blqw
             UID = Guid.NewGuid();
             Init();
             TypeCodes = TypeInfo.TypeCodes;
-            var mapping = (IMemberMappingAttributre)Attribute.GetCustomAttribute(MemberInfo, typeof(IMemberMappingAttributre));
+            Attributes = new AttributeCollection(MemberInfo);
+            var mapping = Attributes.First<IMemberMappingAttributre>();
             if (mapping != null)
             {
                 MappingName = mapping.Name;
@@ -57,7 +58,8 @@ namespace blqw
             UID = Guid.NewGuid();
             TypeCodes = TypeInfo.TypeCodes;
             AutoField = (field.Name[0] == '<') || field.Name.Contains("<");
-            var mapping = (IMemberMappingAttributre)Attribute.GetCustomAttribute(MemberInfo, typeof(IMemberMappingAttributre));
+            Attributes = new AttributeCollection(MemberInfo);
+            var mapping = Attributes.First<IMemberMappingAttributre>();
             if (mapping != null)
             {
                 MappingName = mapping.Name;
@@ -384,14 +386,9 @@ namespace blqw
             }
         }
 
-        private AttributeCollection _attributes;
-
         /// <summary> 成员特性
         /// </summary>
-        public AttributeCollection Attributes
-        {
-            get { return _attributes ?? (_attributes = new AttributeCollection(MemberInfo)); }
-        }
+        public readonly AttributeCollection Attributes;
 
         /// <summary> 自增id 与Literacy共享序列
         /// </summary>

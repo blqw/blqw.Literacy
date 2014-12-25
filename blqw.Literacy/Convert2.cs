@@ -3082,22 +3082,33 @@ namespace blqw
             Literacy lit2;
             if (ignoreCase)
             {
-                lit1 = TypesHelper.GetTypeInfo<T>().IgnoreCaseLiteracy;
-                lit2 = TypesHelper.GetTypeInfo(model.GetType()).IgnoreCaseLiteracy;
+                lit1 = TypesHelper.GetTypeInfo(model.GetType()).IgnoreCaseLiteracy;
+                lit2 = TypesHelper.GetTypeInfo<T>().IgnoreCaseLiteracy;
             }
             else
             {
-                lit1 = TypesHelper.GetTypeInfo<T>().Literacy;
-                lit2 = TypesHelper.GetTypeInfo(model.GetType()).Literacy;
+                lit1 = TypesHelper.GetTypeInfo(model.GetType()).Literacy;
+                lit2 = TypesHelper.GetTypeInfo<T>().Literacy;
             }
             List<ObjectProperty> props = new List<ObjectProperty>();
-            T result = (T)lit1.NewObject();
+            T result = (T)lit2.NewObject();
             foreach (var p1 in lit1.Property)
             {
-                var p2 = lit2.Property[p1.Name];
-                if (p2 != null)
+                if (p1.CanRead)
                 {
-                    p2.SetValue(result, p1.GetValue(model));
+                    var p2 = lit2.Property.Mapping(p1.MappingName ?? p1.Name) ?? lit2.Property[p1.MappingName ?? p1.Name];
+                    if (p2 != null && p2.CanWrite)
+                    {
+                        var value = p1.GetValue(model);
+                        if (p2.MemberType == p1.MemberType)
+                        {
+                            p2.SetValue(result, value);
+                        }
+                        else
+                        {
+                            p2.SetValue(result, ChangedType(value, p2.MemberType));
+                        }
+                    }
                 }
             }
 
@@ -3108,16 +3119,18 @@ namespace blqw
         {
             var lit = TypesHelper.GetTypeInfo<T>().Literacy;
             var table = new DataTable();
-            var length = lit.Property.Count;
-            var props = new ObjectProperty[length];
-            var index = 0;
+            var props = new List<ObjectProperty>();
             foreach (var prop in lit.Property)
             {
-                props[index++] = prop;
-                var name = prop.
-                table.Columns.Add(prop.Name, prop.MemberType);
+                if (prop.CanRead)
+                {
+                    props.Add(prop);
+                    var name = prop.MappingName ?? prop.Name;
+                    table.Columns.Add(prop.Name, prop.MemberType);
+                }
             }
             var rows = table.Rows;
+            var length = props.Count;
             foreach (var m in models)
             {
                 var row = table.NewRow();
