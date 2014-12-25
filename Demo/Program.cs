@@ -15,6 +15,18 @@ namespace Demo
             public string Name { get; set; }
             public DateTime? Birthday { get; set; }
             public bool Sex { get; set; }
+            public string AAA { get; set; }
+        }
+
+        public class User3
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public DateTime? Birthday { get; set; }
+            public bool Sex { get; set; }
+
+            [MemberMapping("AAA")]
+            public DateTime BBB { get; set; }
         }
         static void Main(string[] args)
         {
@@ -22,10 +34,11 @@ namespace Demo
                 ID = 1,
                 Name = "aaa",
                 Sex = true,
-                Birthday = DateTime.Now
+                Birthday = DateTime.Now,
+                AAA = "2014-1-1"
             };
 
-            var user = Convert2.ToEntity<User>(user2, false);
+            var user = Convert2.ToEntity<User3>(user2, false);
 
 
             //SystemReflection(100000);

@@ -15,7 +15,7 @@ namespace blqw
         }
         public MemberMappingAttribute(string name)
         {
-
+            Name = name;
         }
         /// <summary> 映射名称
         /// </summary>
