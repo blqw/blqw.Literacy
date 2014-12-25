@@ -2924,7 +2924,6 @@ namespace blqw
             }
             var ti = TypesHelper.GetTypeInfo<T>();
             var lit = ti.IgnoreCaseLiteracy;
-            var props = GetProperties(reader, lit);
             var list = new List<T>();
             if (ti.IsSpecialType)
             {
@@ -2935,6 +2934,7 @@ namespace blqw
             }
             else
             {
+                var props = GetProperties(reader, lit);
                 while (reader.Read())
                 {
                     var model = (T)lit.NewObject();
@@ -2994,7 +2994,6 @@ namespace blqw
             }
             var ti = TypesHelper.GetTypeInfo(typeof(T));
             var lit = ti.IgnoreCaseLiteracy;
-            var props = GetProperties(table, lit);
             var list = new List<T>();
             if (ti.IsSpecialType)
             {
@@ -3005,6 +3004,7 @@ namespace blqw
             }
             else
             {
+                var props = GetProperties(table, lit);
                 foreach (DataRow row in table.Rows)
                 {
                     var model = (T)lit.NewObject();
@@ -3032,7 +3032,6 @@ namespace blqw
                 {
                     props[i] = p;
                 }
-                props[i] = p;
             }
             return props;
         }
