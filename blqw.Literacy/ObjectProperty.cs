@@ -33,6 +33,11 @@ namespace blqw
             UID = Guid.NewGuid();
             Init();
             TypeCodes = TypeInfo.TypeCodes;
+            var mapping = (IMemberMappingAttributre)Attribute.GetCustomAttribute(MemberInfo, typeof(IMemberMappingAttributre));
+            if (mapping != null)
+            {
+                MappingName = mapping.Name;
+            }
         }
 
         /// <summary> 表示一个可以获取或者设置其内容的对象字段
@@ -52,6 +57,11 @@ namespace blqw
             UID = Guid.NewGuid();
             TypeCodes = TypeInfo.TypeCodes;
             AutoField = (field.Name[0] == '<') || field.Name.Contains("<");
+            var mapping = (IMemberMappingAttributre)Attribute.GetCustomAttribute(MemberInfo, typeof(IMemberMappingAttributre));
+            if (mapping != null)
+            {
+                MappingName = mapping.Name;
+            }
         }
 
         #region 只读属性
@@ -216,7 +226,7 @@ namespace blqw
         /// <summary> 初始化
         /// </summary>
         private void Init()
-        {
+        { 
             Name = MemberInfo.Name;
             ClassType = MemberInfo.DeclaringType;
             TypeInfo = TypesHelper.GetTypeInfo(OriginalType);
@@ -398,5 +408,9 @@ namespace blqw
         /// <summary> 是自动属性
         /// </summary>
         public readonly bool AutoField;
+
+        /// <summary> 实体的映射名称,通过IMemberMappingAttributre接口指定,如果没有则为null
+        /// </summary>
+        public readonly string MappingName;
     }
 }

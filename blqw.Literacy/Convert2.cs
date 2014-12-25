@@ -3075,6 +3075,61 @@ namespace blqw
         }
         #endregion
 
+
+        public static T ToEntity<T>(object model, bool ignoreCase)
+        {
+            Literacy lit1;
+            Literacy lit2;
+            if (ignoreCase)
+            {
+                lit1 = TypesHelper.GetTypeInfo<T>().IgnoreCaseLiteracy;
+                lit2 = TypesHelper.GetTypeInfo(model.GetType()).IgnoreCaseLiteracy;
+            }
+            else
+            {
+                lit1 = TypesHelper.GetTypeInfo<T>().Literacy;
+                lit2 = TypesHelper.GetTypeInfo(model.GetType()).Literacy;
+            }
+            List<ObjectProperty> props = new List<ObjectProperty>();
+            T result = (T)lit1.NewObject();
+            foreach (var p1 in lit1.Property)
+            {
+                var p2 = lit2.Property[p1.Name];
+                if (p2 != null)
+                {
+                    p2.SetValue(result, p1.GetValue(model));
+                }
+            }
+
+            return result;
+        }
+
+        public static DataTable ToDataTable<T>(IEnumerable<T> models)
+        {
+            var lit = TypesHelper.GetTypeInfo<T>().Literacy;
+            var table = new DataTable();
+            var length = lit.Property.Count;
+            var props = new ObjectProperty[length];
+            var index = 0;
+            foreach (var prop in lit.Property)
+            {
+                props[index++] = prop;
+                var name = prop.
+                table.Columns.Add(prop.Name, prop.MemberType);
+            }
+            var rows = table.Rows;
+            foreach (var m in models)
+            {
+                var row = table.NewRow();
+                for (int i = 0; i < length; i++)
+                {
+                    row[i] = props[i].GetValue(m);
+                }
+                rows.Add(row);
+            }
+            return table;
+        }
+
         #endregion
 
         #region 半角全角转换

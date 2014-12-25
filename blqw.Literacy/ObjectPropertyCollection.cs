@@ -92,10 +92,9 @@ namespace blqw
             else
             {
                 _Items.Add(name, value);
-                var mapping = value.Attributes.First<IMemberMappingAttributre>(); //获取映射名称
-                if (mapping != null)
+                if (value.MappingName != null)
                 {
-                    _Items.Add("\0" + mapping.Name, value);
+                    _Items.Add("\0" + value.MappingName, value);
                 }
                 Count++;
             }

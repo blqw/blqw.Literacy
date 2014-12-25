@@ -69,6 +69,10 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 
 
 ## 更新说明  
+#### 2014.12.25  
+* ObjectProperty中增加 MappingName 属性  
+* Convert2中增加对象转对象和对象转DataTable的相关方法  
+
 #### 2014.12.12
 * 在 Convert2 中增加全角转半角 半角转全角的方法  
 
