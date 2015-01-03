@@ -2556,7 +2556,7 @@ namespace blqw
                     case 5:
                         if (input.Equals("false", StringComparison.OrdinalIgnoreCase))
                         {
-                            value = true;
+                            value = false;
                             return true;
                         }
                         break;
