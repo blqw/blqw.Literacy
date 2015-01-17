@@ -411,7 +411,7 @@ namespace blqw
                 return value;
             }
             if (throwOnError)
-                ThrowError(input, defaultValue);
+                ThrowError<T>(input, defaultValue);
             return defaultValue;
         }
         public static object ChangedType(object input, Type outputType, object defaultValue = null, bool throwOnError = true)
@@ -422,7 +422,23 @@ namespace blqw
                 return value;
             }
             if (throwOnError)
-                ThrowError(input, defaultValue);
+            {
+                string x;
+                if (input == null)
+                {
+                    x = "<null>";
+                }
+                else if (input is DBNull)
+                {
+                    x = "<DBNull>";
+                }
+                else
+                {
+                    x = input.ToString();
+                }
+                var name = TypesHelper.GetTypeInfo(outputType).DisplayName;
+                throw new InvalidCastException(string.Concat("值 '", x, "' 无法转为 ", name, " 类型"));
+            }
             return defaultValue;
         }
 
