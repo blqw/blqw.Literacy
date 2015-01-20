@@ -3290,7 +3290,7 @@ namespace blqw
         /// </summary>
         /// <param name="input">加密字符串</param>
         /// <param name="count">加密次数</param>
-        public static string MD5x16(string input, int count = 1)
+        public static string ToMD5x16(string input, int count = 1)
         {
             if (count <= 0)
             {
@@ -3298,21 +3298,21 @@ namespace blqw
             }
             for (int i = 0; i < count; i++)
             {
-                input = MD5x16(input);
+                input = ToMD5x16(input);
             }
             return input;
         }
         /// <summary> 使用16位MD5加密
         /// </summary>
         /// <param name="input">加密字符串</param>
-        public static string MD5x16(string input)
+        public static string ToMD5x16(string input)
         {
-            return MD5x16(Encoding.UTF8.GetBytes(input));
+            return ToMD5x16(Encoding.UTF8.GetBytes(input));
         }
         /// <summary> 使用MD5加密
         /// </summary>
         /// <param name="input">需要加密的字节</param>
-        public static string MD5x16(byte[] input)
+        public static string ToMD5x16(byte[] input)
         {
             var md5 = new MD5CryptoServiceProvider();
             var data = Hash(md5, input);
@@ -3322,7 +3322,7 @@ namespace blqw
         /// </summary>
         /// <param name="input">加密字符串</param>
         /// <param name="count">加密次数</param>
-        public static string MD5(string input, int count = 1)
+        public static string ToMD5(string input, int count = 1)
         {
             if (count <= 0)
             {
@@ -3330,21 +3330,21 @@ namespace blqw
             }
             for (int i = 0; i < count; i++)
             {
-                input = MD5(input);
+                input = ToMD5(input);
             }
             return input;
         }
         /// <summary> 使用MD5加密
         /// </summary>
         /// <param name="input">加密字符串</param>
-        public static string MD5(string input)
+        public static string ToMD5(string input)
         {
-            return MD5(Encoding.UTF8.GetBytes(input));
+            return ToMD5(Encoding.UTF8.GetBytes(input));
         }
         /// <summary> 使用MD5加密
         /// </summary>
         /// <param name="input">需要加密的字节</param>
-        public static string MD5(byte[] input)
+        public static string ToMD5(byte[] input)
         {
             var md5 = new MD5CryptoServiceProvider();
             var data = Hash(md5, input);
@@ -3354,7 +3354,7 @@ namespace blqw
         /// </summary>
         /// <param name="input">加密字符串</param>
         /// <param name="count">加密次数</param>
-        public static string SHA1(string input, int count = 1)
+        public static string ToSHA1(string input, int count = 1)
         {
             if (count <= 0)
             {
@@ -3371,30 +3371,20 @@ namespace blqw
         /// <summary> 使用SHA1加密
         /// </summary>
         /// <param name="input">加密字符串</param>
-        public static string SHA1(string input)
+        public static string ToSHA1(string input)
         {
-            return SHA1(Encoding.UTF8.GetBytes(input));
+            return ToSHA1(Encoding.UTF8.GetBytes(input));
         }
         /// <summary> 使用SHA1加密
         /// </summary>
         /// <param name="input">需要加密的字节</param>
-        public static string SHA1(byte[] input)
+        public static string ToSHA1(byte[] input)
         {
             var sha1 = new SHA1CryptoServiceProvider();
             var data = Hash(sha1, input);
             return ByteToString(data);
         }
 
-        private static byte[] CreateKeyOrIv(string str)
-        {
-            var arr = Encoding.Unicode.GetBytes(str);
-            var s = new byte[8];
-            for (int i = 0; i < 8; i++)
-            {
-                s[i] = arr[i * 2];
-            }
-            return s;
-        }
         private static string ByteToString(byte[] data)
         {
             return ByteToString(data, 0, data.Length);
@@ -3422,10 +3412,6 @@ namespace blqw
         private static byte[] Hash(HashAlgorithm algorithm, byte[] input)
         {
             return algorithm.ComputeHash(input);
-        }
-        private static byte[] Hash(HashAlgorithm algorithm, byte[] input, int offset, int count)
-        {
-            return algorithm.ComputeHash(input, offset, count);
         }
         #endregion
     }
