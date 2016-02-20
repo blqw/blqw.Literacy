@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace blqw
+namespace blqw.Reflection
 {
     /// <summary> 对象成员映射关系特性
     /// </summary>

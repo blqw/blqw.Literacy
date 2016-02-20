@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace blqw
+namespace blqw.Reflection
 {
     /// <summary> 特性集合,用于方便快速的操作特性
     /// </summary>

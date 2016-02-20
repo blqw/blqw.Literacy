@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace blqw
+namespace blqw.Reflection
 {
     /// <summary> 对象属性/字段集合
     /// </summary>

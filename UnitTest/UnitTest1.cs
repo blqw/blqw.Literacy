@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using blqw.Reflection;
+
 namespace UnitTest
 {
     [TestClass]
@@ -12,7 +14,7 @@ namespace UnitTest
         {
             ClassEntity obj = new ClassEntity();
 
-            blqw.Literacy lit = new blqw.Literacy(obj.GetType());
+            Literacy lit = new Literacy(obj.GetType());
 
             object value;
             //公共实例属性
@@ -67,7 +69,7 @@ namespace UnitTest
             StructEntity.StaticClassProperty = "B";
             StructEntity.StaticStructProperty = 2;
 
-            blqw.Literacy lit = new blqw.Literacy(obj.GetType());
+            Literacy lit = new Literacy(obj.GetType());
 
             object value;
             //公共实例属性
@@ -109,7 +111,7 @@ namespace UnitTest
         {
             ClassEntity obj = new ClassEntity();
 
-            blqw.Literacy lit = new blqw.Literacy(obj.GetType());
+            Literacy lit = new Literacy(obj.GetType());
 
             object value;
             //公共实例字段
@@ -165,7 +167,7 @@ namespace UnitTest
             StructEntity.StaticClassField = "B";
             StructEntity.StaticStructField = 2;
 
-            blqw.Literacy lit = new blqw.Literacy(obj.GetType());
+            Literacy lit = new Literacy(obj.GetType());
 
             object value;
             lit.Load.PublicField();
@@ -215,7 +217,7 @@ namespace UnitTest
                 int i = 26;
                 object[] args = new object[] { str, i };
 
-                var caller = blqw.Literacy.CreateCaller(method);
+                var caller = Literacy.CreateCaller(method);
                 if (method.Name.EndsWith("Ref"))
                 {
                     var val = caller(obj, args);
@@ -262,7 +264,7 @@ namespace UnitTest
                 int i = 26;
                 object[] args = new object[] { str, i };
 
-                var caller = blqw.Literacy.CreateCaller(method);
+                var caller = Literacy.CreateCaller(method);
                 if (method.Name.EndsWith("Ref"))
                 {
                     var val = caller(obj, args);
@@ -300,11 +302,11 @@ namespace UnitTest
         [TestMethod]
         public void TestCreateClass()
         {
-            var new1 = blqw.Literacy.CreateNewObject(typeof(ClassEntity), null);
+            var new1 = Literacy.CreateNewObject(typeof(ClassEntity), null);
             var obj1 = (ClassEntity)new1();
             Assert.AreNotEqual(null, obj1);
 
-            var new2 = blqw.Literacy.CreateNewObject(typeof(ClassEntity), new Type[] { typeof(string), typeof(int) });
+            var new2 = Literacy.CreateNewObject(typeof(ClassEntity), new Type[] { typeof(string), typeof(int) });
             var obj2 = (ClassEntity)new2("A", 1);
             Assert.AreEqual("A", obj2.ClassProperty);
             Assert.AreEqual(1, obj2.StructProperty);
@@ -313,11 +315,11 @@ namespace UnitTest
         [TestMethod]
         public void TestCreateStruct()
         {
-            var new1 = blqw.Literacy.CreateNewObject(typeof(StructEntity), null);
+            var new1 = Literacy.CreateNewObject(typeof(StructEntity), null);
             var obj1 = (StructEntity)new1();
             Assert.AreNotEqual(null, obj1);
 
-            var new2 = blqw.Literacy.CreateNewObject(typeof(StructEntity), new Type[] { typeof(string), typeof(int) });
+            var new2 = Literacy.CreateNewObject(typeof(StructEntity), new Type[] { typeof(string), typeof(int) });
             var obj2 = (StructEntity)new2("A", 1);
             Assert.AreEqual("A", obj2.ClassProperty);
             Assert.AreEqual(1, obj2.StructProperty);
@@ -327,7 +329,7 @@ namespace UnitTest
         [TestMethod]
         public void TestTypeAttr()
         {
-            var lit1 = blqw.Literacy.Cache(typeof(ClassEntity), false);
+            var lit1 = Literacy.Cache(typeof(ClassEntity), false);
             Assert.AreEqual(3, lit1.Attributes.Count);
             Assert.IsTrue(lit1.Attributes.Exists(typeof(TestAttribute)));
             Assert.IsTrue(lit1.Attributes.Exists<TestAttribute>());
@@ -346,7 +348,7 @@ namespace UnitTest
             Assert.AreEqual(0, lit1.Attributes.Where<TestMethodAttribute>(it => false).Count());
 
 
-            var lit2 = blqw.Literacy.Cache(typeof(StructEntity), false);
+            var lit2 = Literacy.Cache(typeof(StructEntity), false);
             Assert.AreEqual(2, lit2.Attributes.Count);
             Assert.IsNotNull(lit2.Attributes.First(typeof(TestAttribute)));
             Assert.IsNotNull(lit2.Attributes.First<TestAttribute>());
@@ -362,8 +364,8 @@ namespace UnitTest
         [TestMethod]
         public void TestPropertyAttr()
         {
-            var lit1 = blqw.Literacy.Cache(typeof(ClassEntity), false);
-            var lit2 = blqw.Literacy.Cache(typeof(StructEntity), false);
+            var lit1 = Literacy.Cache(typeof(ClassEntity), false);
+            var lit2 = Literacy.Cache(typeof(StructEntity), false);
             lit1.Load.NonPublicProperty();
             lit1.Load.StaticProperty(true);
             lit2.Load.NonPublicProperty();

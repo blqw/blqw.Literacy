@@ -7,9 +7,9 @@
     <ProjectGuid>{D0C3B619-180A-407B-BE4A-9C1864B2A06D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>blqw</RootNamespace>
+    <RootNamespace>blqw.Reflection</RootNamespace>
     <AssemblyName>blqw.Literacy</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,26 +32,35 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributeCollection.cs" />
-    <Compile Include="Convert2.cs" />
+    <Compile Include="Cache\TypeCache.cs" />
+    <Compile Include="Cache\TypeCacheItem.cs" />
     <Compile Include="Delegate.cs" />
     <Compile Include="ILoadMember.cs" />
     <Compile Include="IMemberMappingAttribute.cs" />
+    <Compile Include="IOC\Component.cs" />
+    <Compile Include="IOC\ConstructorInfoEx.cs" />
+    <Compile Include="IOC\ExportComponent.cs" />
+    <Compile Include="IOC\FieldInfoEx.cs" />
+    <Compile Include="IOC\MEF.cs" />
+    <Compile Include="IOC\MethodInfoEx.cs" />
+    <Compile Include="IOC\PropertyInfoEx.cs" />
+    <Compile Include="IOC\TypeEx.cs" />
     <Compile Include="Literacy.cs" />
     <Compile Include="MemberMappingAttribute.cs" />
     <Compile Include="ObjectProperty.cs" />
     <Compile Include="ObjectPropertyCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeCodes.cs" />
-    <Compile Include="TypeInfo.cs" />
-    <Compile Include="TypesHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

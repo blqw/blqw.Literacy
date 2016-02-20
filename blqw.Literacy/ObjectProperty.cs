@@ -1,27 +1,73 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
-namespace blqw
+namespace blqw.Reflection
 {
     /// <summary> 表示一个可以快速获取或者设置其对象属性/字段值的对象
     /// </summary>
     public sealed class ObjectProperty
     {
+        static readonly Dictionary<MemberInfo, ObjectProperty> _Cache = new Dictionary<MemberInfo, ObjectProperty>();
+
+        /// <summary> 从缓存中获取对象,如果不存在则创建
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        public static ObjectProperty Cache(MemberInfo member)
+        {
+            ObjectProperty op;
+            if (_Cache.TryGetValue(member, out op))
+            {
+                return op;
+            }
+            if (member.MemberType != MemberTypes.Field &&
+                member.MemberType != MemberTypes.Property)
+            {
+                return null;
+            }
+            lock (_Cache)
+            {
+                if (_Cache.TryGetValue(member, out op))
+                {
+                    return op;
+                }
+                if (member.MemberType == MemberTypes.Field)
+                {
+                    op = new ObjectProperty((FieldInfo)member);
+                }
+                else
+                {
+                    op = new ObjectProperty((PropertyInfo)member);
+                }
+                _Cache[member] = op;
+                return op;
+            }
+        }
+
+
         /// <summary> 表示一个可以获取或者设置其内容的对象属性
         /// </summary>
         /// <param name="property">属性信息</param>
-        public ObjectProperty(PropertyInfo property)
+        private ObjectProperty(PropertyInfo property)
         {
             Field = false;
             MemberInfo = property; //属性信息
             OriginalType = property.PropertyType;
             var get = property.GetGetMethod(true); //获取属性get方法,不论是否公开
             var set = property.GetSetMethod(true); //获取属性set方法,不论是否公开
-            if (set != null) //set方法不为空                    
+            if (set != null  //set方法不为空
+                && property.GetIndexParameters().Length ==0)                    
             {
                 CanWrite = true; //属性可写
                 Static = set.IsStatic; //属性是否为静态属性
                 IsPublic = set.IsPublic;
+            }
+            else if (property.DeclaringType.Name.StartsWith("<>f__AnonymousType")) //匿名类
+            {
+                CanWrite = true;
+                IsPublic = false;
             }
             if (get != null) //get方法不为空
             {
@@ -32,7 +78,15 @@ namespace blqw
             ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
             UID = Guid.NewGuid();
             Init();
-            TypeCodes = TypeInfo.TypeCodes;
+            if (set == null && CanWrite) //匿名类的属性设置特殊处理
+            {
+                Setter = (o, v) =>
+                {
+                    var field = ClassType.GetField("<" + Name + ">i__Field", (BindingFlags)(-1));
+                    Setter = Literacy.CreateSetter(field, ClassType);
+                    Setter(o, v);
+                };
+            }
             Attributes = new AttributeCollection(MemberInfo);
             var mapping = Attributes.First<IMemberMappingAttribute>();
             if (mapping != null)
@@ -44,19 +98,18 @@ namespace blqw
         /// <summary> 表示一个可以获取或者设置其内容的对象字段
         /// </summary>
         /// <param name="field">字段信息</param>
-        public ObjectProperty(FieldInfo field)
+        private ObjectProperty(FieldInfo field)
         {
             Field = true; //是一个字段
             MemberInfo = field; //字段信息
             OriginalType = field.FieldType; //字段值类型
             Static = field.IsStatic; //字段是否是静态的
             IsPublic = field.IsPublic; //字段是否是公开的
-            CanWrite = !field.IsLiteral; // !field.IsInitOnly; //是否可写取决于ReadOnly
+            CanWrite = !field.IsLiteral; // !field.IsInitOnly; //是否可写取决于是否静态
             CanRead = true; //字段一定可以读
             Init();
             ID = System.Threading.Interlocked.Increment(ref Literacy.Sequence);
             UID = Guid.NewGuid();
-            TypeCodes = TypeInfo.TypeCodes;
             AutoField = (field.Name[0] == '<') || field.Name.Contains("<");
             Attributes = new AttributeCollection(MemberInfo);
             var mapping = Attributes.First<IMemberMappingAttribute>();
@@ -67,10 +120,6 @@ namespace blqw
         }
 
         #region 只读属性
-
-        /// <summary> 属性/字段的类型信息
-        /// </summary>
-        public TypeInfo TypeInfo { get; private set; }
 
         /// <summary> 属性/字段信息
         /// </summary>
@@ -211,6 +260,10 @@ namespace blqw
 
         private object ErrorGetter(object instance)
         {
+            if (((PropertyInfo)MemberInfo).GetIndexParameters().Length > 0)
+            {
+                throw new MethodAccessException("索引器无法取值");
+            }
             throw new MethodAccessException("属性没有公开的Get访问器");
         }
 
@@ -220,6 +273,10 @@ namespace blqw
             {
                 throw new FieldAccessException("无法设置ReadOnly字段");
             }
+            else if (((PropertyInfo)MemberInfo).GetIndexParameters().Length > 0)
+            {
+                throw new MethodAccessException("索引器无法赋值");
+            }
             throw new MethodAccessException("属性没有公开的Set访问器");
         }
 
@@ -228,14 +285,14 @@ namespace blqw
         /// <summary> 初始化
         /// </summary>
         private void Init()
-        { 
+        {
             Name = MemberInfo.Name;
             ClassType = MemberInfo.DeclaringType;
-            TypeInfo = TypesHelper.GetTypeInfo(OriginalType);
-            if (TypeInfo.IsNullable)
+            var nullable = System.Nullable.GetUnderlyingType(OriginalType);
+            if (nullable != null)
             {
                 Nullable = true;
-                MemberType = TypeInfo.NullableUnderlyingType.Type;
+                MemberType = nullable;
             }
             else
             {
@@ -267,7 +324,17 @@ namespace blqw
             {
                 throw new ArgumentException("对象[" + instance + "]无法获取[" + MemberInfo + "]的值");
             }
-            return Getter(instance);
+
+            try
+            {
+                return Getter(instance);
+            }
+            catch (Exception ex)
+            {
+                var message = $"{MemberInfo.ReflectedType.ToString()}.{Name}属性取值失败";
+                Trace.WriteLine(ex, message);
+                throw new TargetInvocationException(message + ",原因见内部异常", ex);
+            }
         }
 
         /// <summary> 尝试获取对象的属性/字段值,失败返回false
@@ -294,7 +361,17 @@ namespace blqw
                 value = null;
                 return false;
             }
-            value = Getter(instance);
+            try
+            {
+                value = Getter(instance);
+            }
+            catch (Exception ex)
+            {
+                var message = $"{MemberInfo.ReflectedType.ToString()}.{Name}属性取值失败";
+                Trace.WriteLine(ex, message);
+                value = null;
+                return false;
+            }
             return true;
         }
 
@@ -328,12 +405,25 @@ namespace blqw
                 {
                     value = Enum.Parse(MemberType, str, true);
                 }
+                else
+                {
+                    value = Enum.ToObject(MemberType, value);
+                }
             }
             else if (MemberType.IsInstanceOfType(value) == false)
             {
                 value = Convert.ChangeType(value, MemberType);
             }
-            Setter(instance, value);
+            try
+            {
+                Setter(instance, value);
+            }
+            catch (Exception ex)
+            {
+                var message = $"{MemberInfo.ReflectedType.ToString()}.{Name}赋值失败";
+                Trace.WriteLine(ex, message);
+                throw new TargetInvocationException(message + ",原因见内部异常", ex);
+            }
         }
 
         /// <summary> 尝试设置对象的属性/字段值,失败返回false
@@ -380,8 +470,10 @@ namespace blqw
                 Setter(instance, value);
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
+                var message = $"{MemberInfo.ReflectedType.ToString()}.{Name}属性取值失败";
+                Trace.WriteLine(ex, message);
                 return false;
             }
         }
@@ -398,15 +490,11 @@ namespace blqw
         /// </summary>
         public readonly Guid UID;
 
-        /// <summary> 指定对象类型
-        /// </summary>
-        public readonly TypeCodes TypeCodes;
-
         /// <summary> 是自动属性
         /// </summary>
         public readonly bool AutoField;
 
-        /// <summary> 实体的映射名称,通过IMemberMappingAttributre接口指定,如果没有则为null
+        /// <summary> 实体的映射名称
         /// </summary>
         public readonly string MappingName;
     }

@@ -1,5 +1,5 @@
 ﻿
-namespace blqw
+namespace blqw.Reflection
 {
     /// <summary> 手动选择加载字段或属性
     /// </summary>

@@ -1,14 +1,10 @@
 # 使用IL.Emit方式快速访问属性,字段和方法   
-http://www.cnblogs.com/blqw/p/Literacy.html  
-这个项目是一个非常独立的代码库,使用.net2.0编译,不需要引用其他任何dll和别的项目  
-在我的其他项目中,几乎都引用了这个项目,如 [blqw.Json](https://code.csdn.net/jy02305022/blqw-json), [blqw.Ajax2](https://code.csdn.net/jy02305022/blqw-ajax2), [blqw.FQL](https://code.csdn.net/jy02305022/blqw-fql) 等  
 
 ## 特色  
 ### 全,易,快
 功能强大  
 上手简单  
 性能优异  
-
 
 ## 与反射的性能比较
     MethodInfo 循环 1000000 次  
@@ -69,6 +65,20 @@ http://www.cnblogs.com/blqw/p/Literacy.html
 
 
 ## 更新说明  
+
+#### 2016.02.20  
+* 优化IoC模块  
+
+#### 2015.11.06
+* 将 Convert3 独立  
+* 内置MEF模块,用于IOC方式载入Convert3  
+
+#### 2015.06.11  
+* 增加对匿名类的支持,支持包括匿名类的属性赋值和new操作  
+
+#### 2015.06.09  
+* 签入Convert3项目 代替原有类型转换方案 删除部分不常用的特性  
+
 #### 2014.12.25  
 * ObjectProperty中增加 MappingName 属性  
 * Convert2中增加对象转对象和对象转DataTable的相关方法  

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace blqw
+namespace blqw.Reflection
 {
     /// <summary> 控制对象成员名称的映射关系
     /// </summary>
