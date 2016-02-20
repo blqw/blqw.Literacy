@@ -21,7 +21,7 @@
 >46ms        92,546,226               0        0        0     
 
 #### 性能测试代码
-```
+```csharp
 static void Main(string[] args)
 {
     User u = new User();
