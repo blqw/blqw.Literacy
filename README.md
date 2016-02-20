@@ -6,61 +6,62 @@
 上手简单  
 性能优异  
 
-## 与反射的性能比较
-    MethodInfo 循环 1000000 次  
-    运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )    
-    209ms       413,287,378              0        0        0     
-                                                               
-    Literacy 循环 1000000 次                                      
-    运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )   
-    52ms        103,657,391              0        0        0     
-                                                               
-    dynamic 循环 1000000 次                                       
-    运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )   
-    46ms        92,546,226               0        0        0     
+## 与反射的性能比较  
+
+>MethodInfo 循环 1000000 次  
+>运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )    
+>209ms       413,287,378              0        0        0     
+>                                                           
+>Literacy 循环 1000000 次                                      
+>运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )   
+>52ms        103,657,391              0        0        0     
+>                                                           
+>dynamic 循环 1000000 次                                       
+>运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )   
+>46ms        92,546,226               0        0        0     
 
 #### 性能测试代码
+```
+static void Main(string[] args)
+{
+    User u = new User();
+    CodeTimer.Initialize();
+    CodeTimer.Time("MethodInfo", 1000000, () => GetName2(u));
+    CodeTimer.Time("Literacy", 1000000, () => GetName(u));
+    CodeTimer.Time("dynamic", 1000000, () => GetName3(u));
+}
 
-    static void Main(string[] args)
+static ObjectProperty prop;
+
+public static object GetName(object obj)
+{
+    if (obj == null) throw new ArgumentNullException("obj");
+    if (prop == null)
     {
-        User u = new User();
-        CodeTimer.Initialize();
-        CodeTimer.Time("MethodInfo", 1000000, () => GetName2(u));
-        CodeTimer.Time("Literacy", 1000000, () => GetName(u));
-        CodeTimer.Time("dynamic", 1000000, () => GetName3(u));
+        prop = new Literacy(obj.GetType()).Property["Name"];
+        if (prop == null) throw new NotSupportedException("对象不包含Name属性");
     }
+    return prop.GetValue(obj);
+}
 
-    static ObjectProperty prop;
+static MethodInfo getName;
 
-    public static object GetName(object obj)
+public static object GetName2(object obj)
+{
+    if (obj == null) throw new ArgumentNullException("obj");
+    if (getName == null)
     {
-        if (obj == null) throw new ArgumentNullException("obj");
-        if (prop == null)
-        {
-            prop = new Literacy(obj.GetType()).Property["Name"];
-            if (prop == null) throw new NotSupportedException("对象不包含Name属性");
-        }
-        return prop.GetValue(obj);
+        getName = obj.GetType().GetProperty("Name").GetGetMethod();
     }
+    return getName.Invoke(obj, null); //缓存了反射Name属性
+}
 
-    static MethodInfo getName;
-
-    public static object GetName2(object obj)
-    {
-        if (obj == null) throw new ArgumentNullException("obj");
-        if (getName == null)
-        {
-            getName = obj.GetType().GetProperty("Name").GetGetMethod();
-        }
-        return getName.Invoke(obj, null); //缓存了反射Name属性
-    }
-
-    public static object GetName3(object obj)
-    {
-        if (obj == null) throw new ArgumentNullException("obj");
-        return ((dynamic)obj).Name;
-    }
-
+public static object GetName3(object obj)
+{
+    if (obj == null) throw new ArgumentNullException("obj");
+    return ((dynamic)obj).Name;
+}
+```
 
 ## 更新说明  
 
