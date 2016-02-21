@@ -6,7 +6,6 @@ using blqw.ReflectionComponent;
 
 namespace blqw.Reflection
 {
-    [Export("Component")]
     class Component
     {
         public static readonly bool Initialized = Initialize();
