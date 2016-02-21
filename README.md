@@ -65,6 +65,9 @@ public static object GetName3(object obj)
 
 ## 更新说明  
 
+#### 2016.02.21  
+* 增加导入插件 `CreateGetter`,`CreateSetter`,`CreateCaller`
+
 #### 2016.02.20  
 * 优化IoC模块  
 

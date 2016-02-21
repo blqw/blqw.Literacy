@@ -29,7 +29,7 @@ namespace blqw.Reflection
             {
                 return TypeEx.Cache(type);
             }
-            
+
             switch (member.MemberType)
             {
                 case MemberTypes.Constructor:
@@ -43,6 +43,51 @@ namespace blqw.Reflection
                 default:
                     return member;
             }
+        }
+
+
+        [Export("CreateGetter")]
+        [ExportMetadata("Priority", 100)]
+        public static Func<object, object> CreateGetter(MemberInfo fieldOrProperty)
+        {
+            var p = ObjectProperty.Cache(fieldOrProperty);
+            if (p == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(fieldOrProperty), "参数只能是字段或者属性");
+            }
+            return Convert<Func<object, object>>(p.GetValue);
+        }
+
+
+        [Export("CreateSetter")]
+        [ExportMetadata("Priority", 100)]
+        public static Action<object, object> CreateSetter(MemberInfo fieldOrProperty)
+        {
+            var p = ObjectProperty.Cache(fieldOrProperty);
+            if (p == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(fieldOrProperty), "参数只能是字段或者属性");
+            }
+            return Convert<Action<object, object>>(p.SetValue);
+        }
+
+        [Export("CreateCaller")]
+        [ExportMetadata("Priority", 100)]
+        public static Func<object, object[], object> CreateCaller(MethodInfo method)
+        {
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+            var caller = Literacy.CreateCaller(method);
+            return Convert<Func<object, object[], object>>((o, a) => caller(o, a));
+        }
+
+
+        private static T Convert<T>(T t)
+        {
+            var @delegate = (Delegate)(object)t;
+            return (T)(object)@delegate.Method.CreateDelegate(typeof(T), @delegate.Target);
         }
     }
 }

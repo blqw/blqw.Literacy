@@ -52,7 +52,7 @@
     <Compile Include="IOC\ConstructorInfoEx.cs" />
     <Compile Include="IOC\ExportComponent.cs" />
     <Compile Include="IOC\FieldInfoEx.cs" />
-    <Compile Include="IOC\MEF.cs" />
+    <Compile Include="IOC\MEFPart.cs" />
     <Compile Include="IOC\MethodInfoEx.cs" />
     <Compile Include="IOC\PropertyInfoEx.cs" />
     <Compile Include="IOC\TypeEx.cs" />

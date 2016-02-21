@@ -20,7 +20,7 @@ namespace blqw.ReflectionComponent
     /// 用于执行MEF相关操作
     /// </summary>
     [Export("MEF")]
-    sealed class MEF
+    public sealed class MEFPart
     {
         /// <summary>
         /// 字符串锁
@@ -83,7 +83,7 @@ namespace blqw.ReflectionComponent
                 foreach (var mef in container.GetExportedValues<object>("MEF"))
                 {
                     var type = mef.GetType();
-                    if (type == typeof(MEF))
+                    if (type == typeof(MEFPart))
                     {
                         continue;
                     }
