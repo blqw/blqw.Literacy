@@ -55,7 +55,11 @@ namespace blqw.Reflection
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldOrProperty), "参数只能是字段或者属性");
             }
-            return Convert<Func<object, object>>(p.GetValue);
+            if (p.CanRead)
+            {
+                return Convert<Func<object, object>>(p.GetValue);
+            }
+            return null;
         }
 
 
@@ -68,7 +72,11 @@ namespace blqw.Reflection
             {
                 throw new ArgumentOutOfRangeException(nameof(fieldOrProperty), "参数只能是字段或者属性");
             }
-            return Convert<Action<object, object>>(p.SetValue);
+            if (p.CanWrite)
+            {
+                return Convert<Action<object, object>>(p.SetValue);
+            }
+            return null;
         }
 
         [Export("CreateCaller")]

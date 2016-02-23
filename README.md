@@ -64,6 +64,8 @@ public static object GetName3(object obj)
 ```
 
 ## 更新说明  
+#### 2016.02.23  
+* 修复bug  
 
 #### 2016.02.21  
 * 增加导入插件 `CreateGetter`,`CreateSetter`,`CreateCaller`
