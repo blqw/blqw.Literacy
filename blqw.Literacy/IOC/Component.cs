@@ -8,14 +8,10 @@ namespace blqw.Reflection
 {
     class Component
     {
-        public static readonly bool Initialized = Initialize();
-
-        private static bool Initialize()
+        public Component()
         {
             MEFPart.Import(typeof(Component));
-            return true;
         }
-
 
         [Import("GetConverter")]
         public static readonly IFormatterConverter Converter = new FormatterConverter();
