@@ -29,7 +29,7 @@ namespace Demo
 
             foreach (var t in tester)
             {
-                t.TestCount = 100000;
+                t.TestCount = 1000000;
                 t.State = new User() { Name = "blqw1" };
                 t.Start();
             }
