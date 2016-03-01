@@ -23,7 +23,7 @@ namespace Demo
             var tester = new TesterBase[]
             {
                 new LinqTester(),
-                new SystemReflectionTester(),
+                new CreateDelegateTester(),
                 new LiteracyTester(),
             };
 

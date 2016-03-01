@@ -50,7 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tester\LinqTester.cs" />
     <Compile Include="Tester\LiteracyTester.cs" />
-    <Compile Include="Tester\SystemReflectionTester.cs" />
+    <Compile Include="Tester\CreateDelegateTester.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>

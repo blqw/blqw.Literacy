@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Demo
 {
-    class SystemReflectionTester : TesterBase
+    class CreateDelegateTester : TesterBase
     {
         Func<object, object> _Get = null;
         Action<object, object> _Set = null;
