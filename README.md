@@ -11,7 +11,7 @@
 ### 测试1  
 <table>
 <tr><th>测试内容</th><th>循环次数</th><th>运行时间</th><th>CPU时钟周期</th></tr>
-<tr><td> MethodInfo.Invoke </td><td> 1000000 </td><td> 204ms </td><td> 467,083,802 </td></tr>
+<tr><td> PropertyInfo.GetValue() </td><td> 1000000 </td><td> 204ms </td><td> 467,083,802 </td></tr>
 <tr><td> dynamic </td><td> 1000000 </td><td> 41ms </td><td> 92,844,899 </td></tr>
 <tr><td> Literacy </td><td> 1000000 </td><td> 28ms </td><td> 65,759,428 </td></tr>
 </table>
