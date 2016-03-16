@@ -8,60 +8,22 @@
 
 ## 与反射的性能比较  
 
->MethodInfo 循环 1000000 次  
->运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )    
->209ms       413,287,378              0        0        0     
->                                                           
->Literacy 循环 1000000 次                                      
->运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )   
->52ms        103,657,391              0        0        0     
->                                                           
->dynamic 循环 1000000 次                                       
->运行时间    CPU时钟周期    垃圾回收( 1代      2代      3代 )   
->46ms        92,546,226               0        0        0     
+### 测试1  
+<table>
+<tr><th>测试内容</th><th>循环次数</th><th>运行时间</th><th>CPU时钟周期</th></tr>
+<tr><td> PropertyInfo.GetValue() </td><td> 1000000 </td><td> 204ms </td><td> 467,083,802 </td></tr>
+<tr><td> dynamic </td><td> 1000000 </td><td> 41ms </td><td> 92,844,899 </td></tr>
+<tr><td> Literacy </td><td> 1000000 </td><td> 28ms </td><td> 65,759,428 </td></tr>
+</table>
+### 测试2  
+<table>
+<tr><th>测试内容</th><th>循环次数</th><th>初始化时间</th><th>运行时间</th><th>CPU时钟周期</th></tr>
+<tr><td> Lambda.Compile() </td><td> 1000000 </td><td> 1.7693ms </td><td> 33ms </td><td> 77,217,274 </td></tr>
+<tr><td> CreateDelegate(GetGetMethod()) </td><td> 1000000 </td><td> 1.8108ms </td><td> 29ms </td><td> 66,729,503 </td></tr>
+<tr><td> Literacy </td><td> 1000000 </td><td> 1.6712ms </td><td> 12ms </td><td> 28,517,667 </td></tr>
+</table>
 
-#### 性能测试代码
-```csharp
-static void Main(string[] args)
-{
-    User u = new User();
-    CodeTimer.Initialize();
-    CodeTimer.Time("MethodInfo", 1000000, () => GetName2(u));
-    CodeTimer.Time("Literacy", 1000000, () => GetName(u));
-    CodeTimer.Time("dynamic", 1000000, () => GetName3(u));
-}
-
-static ObjectProperty prop;
-
-public static object GetName(object obj)
-{
-    if (obj == null) throw new ArgumentNullException("obj");
-    if (prop == null)
-    {
-        prop = new Literacy(obj.GetType()).Property["Name"];
-        if (prop == null) throw new NotSupportedException("对象不包含Name属性");
-    }
-    return prop.GetValue(obj);
-}
-
-static MethodInfo getName;
-
-public static object GetName2(object obj)
-{
-    if (obj == null) throw new ArgumentNullException("obj");
-    if (getName == null)
-    {
-        getName = obj.GetType().GetProperty("Name").GetGetMethod();
-    }
-    return getName.Invoke(obj, null); //缓存了反射Name属性
-}
-
-public static object GetName3(object obj)
-{
-    if (obj == null) throw new ArgumentNullException("obj");
-    return ((dynamic)obj).Name;
-}
-```
+#### [性能测试代码](https://github.com/blqw/blqw.Literacy/blob/master/Demo/Program.cs)
 
 ## 更新说明  
 #### 2016.03.16  

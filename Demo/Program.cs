@@ -15,21 +15,21 @@ namespace Demo
             User u = new User();
             CodeTimer.Initialize();
             CodeTimer.Time("MethodInfo", 1000000, () => GetName2(u));
-            CodeTimer.Time("Literacy", 1000000, () => GetName(u));
             CodeTimer.Time("dynamic", 1000000, () => GetName3(u));
+            CodeTimer.Time("Literacy", 1000000, () => GetName(u));
 
 
 
             var tester = new TesterBase[]
             {
                 new LinqTester(),
-                new SystemReflectionTester(),
+                new CreateDelegateTester(),
                 new LiteracyTester(),
             };
 
             foreach (var t in tester)
             {
-                t.TestCount = 100000;
+                t.TestCount = 1000000;
                 t.State = new User() { Name = "blqw1" };
                 t.Start();
             }
@@ -49,16 +49,16 @@ namespace Demo
             return prop.GetValue(obj);
         }
 
-        static MethodInfo getName;
+        static PropertyInfo pName;
 
         public static object GetName2(object obj)
         {
             if (obj == null) throw new ArgumentNullException("obj");
-            if (getName == null)
+            if (pName == null)
             {
-                getName = typeof(User).GetProperty("Name").GetGetMethod();
+                pName = typeof(User).GetProperty("Name");
             }
-            return getName.Invoke(obj, null); //缓存了反射Name属性
+            return pName.GetValue(obj, null); //缓存了反射Name属性
         }
 
         public static object GetName3(object obj)
