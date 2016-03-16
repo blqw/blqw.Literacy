@@ -64,6 +64,9 @@ public static object GetName3(object obj)
 ```
 
 ## 更新说明  
+#### 2016.03.16  
+* 更新MEF  
+  
 #### 2016.02.23  
 * 修复bug  
 

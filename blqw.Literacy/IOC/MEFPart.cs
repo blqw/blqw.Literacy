@@ -25,7 +25,7 @@ namespace blqw.ReflectionComponent
         /// <summary>
         /// 字符串锁
         /// </summary>
-        const string _Lock = "O[ON}:z05i$*H75O[bJdnedei#('i_i^";
+        const string _Lock = "O[ON}:z05i$*H75O[bJdnedei#('i_i^v2";
 
         /// <summary> 
         /// 是否已初始化完成
@@ -188,7 +188,8 @@ namespace blqw.ReflectionComponent
                     continue;
                 }
                 var value = GetExportedValue(import);
-                f.SetValue(instance, value);
+                if (value != null)
+                    f.SetValue(instance, value);
             }
             var args = new object[1];
             foreach (var p in type.GetProperties(flags))
@@ -204,8 +205,11 @@ namespace blqw.ReflectionComponent
                     continue;
                 }
                 var value = GetExportedValue(import);
-                args[0] = value;
-                set.Invoke(instance, args);
+                if (value != null)
+                {
+                    args[0] = value;
+                    set.Invoke(instance, args);
+                }
             }
         }
 
