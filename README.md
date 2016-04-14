@@ -26,6 +26,9 @@
 #### [性能测试代码](https://github.com/blqw/blqw.Literacy/blob/master/Demo/Program.cs)
 
 ## 更新说明  
+#### 2016.04.15
+* 更新MEF  
+
 #### 2016.02.23  
 * 修复bug  
 

@@ -19,116 +19,126 @@ namespace blqw.ReflectionComponent
     /// <summary>
     /// 用于执行MEF相关操作
     /// </summary>
-    [Export("MEF")]
-    public sealed class MEFPart
+    sealed class MEFPart
     {
         /// <summary>
         /// 字符串锁
         /// </summary>
-        const string _Lock = "O[ON}:z05i$*H75O[bJdnedei#('i_i^";
+        const string _Lock = "O[ON}:z05i$*H75O[bJdnedei#('i_i^v2";
+
 
         /// <summary> 
         /// 是否已初始化完成
         /// </summary>
-        public static bool IsInitialized { get; private set; }
-
-        /// <summary>
-        /// 是否正在初始化
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsInitializeing
-        {
-            get
-            {
-                if (IsInitialized)
-                {
-                    return false;
-                }
-                if (Monitor.IsEntered(_Lock))
-                {
-                    return true;
-                }
-                if (Monitor.TryEnter(_Lock))
-                {
-                    return false;
-                }
-                return true;
-            }
-        }
+        public static bool IsInitialized { get { return Lazy?.IsValueCreated == true; } }
 
         /// <summary>
         /// 插件容器
         /// </summary>
-        public static CompositionContainer Container { get; private set; } = Initializer();
+        public static CompositionContainer Container { get { return Lazy.Value; } }
+
+        private static readonly Lazy<CompositionContainer> Lazy = GetLazy();
+
+        private static Lazy<CompositionContainer> GetLazy()
+        {
+            Lazy<CompositionContainer> lazy;
+            lock (_Lock)
+            {
+                lazy = AppDomain.CurrentDomain.GetData(_Lock) as Lazy<CompositionContainer>;
+                if (lazy == null)
+                {
+                    if (Debugger.IsAttached
+                        && Debug.Listeners.OfType<ConsoleTraceListener>().Any() == false)
+                    {
+                        Debug.Listeners.Add(new ConsoleTraceListener(true));
+                    }
+                    lazy = new Lazy<CompositionContainer>(GetContainer, true);
+                    AppDomain.CurrentDomain.SetData(_Lock, lazy);
+                }
+            }
+            try { var x = lazy.Value; } catch { }
+            return lazy;
+        }
 
         /// <summary> 
         /// 初始化
         /// </summary>
-        public static CompositionContainer Initializer()
+        [Obsolete("自动初始化,不再需要调用该方法")]
+        public static void Initializer()
         {
-            if (IsInitialized || IsInitializeing)
-            {
-                return Container;
-            }
-            try
-            {
-                if (Debugger.IsAttached
-                    && Debug.Listeners.OfType<ConsoleTraceListener>().Any() == false)
-                {
-                    Debug.Listeners.Add(new ConsoleTraceListener(true));
-                }
-                var catalog = GetCatalog();
-                var container = new SelectionPriorityContainer(catalog);
-                var args = new object[] { container };
-                foreach (var mef in container.GetExportedValues<object>("MEF"))
-                {
-                    var type = mef.GetType();
-                    if (type == typeof(MEFPart))
-                    {
-                        continue;
-                    }
-                    var p = type.GetProperty("Container");
-                    if (p != null && p.PropertyType == typeof(CompositionContainer))
-                    {
-                        var set = p.GetSetMethod(true);
-                        if (set != null)
-                        {
-                            set.Invoke(null, args);
-                        }
-                    }
-                }
-                return container;
-            }
-            finally
-            {
-                IsInitialized = true;
-                if (Monitor.IsEntered(_Lock))
-                    Monitor.Exit(_Lock);
-            }
+
         }
 
-        /// <summary> 获取插件
+        /// <summary> 
+        /// 获取插件容器
         /// </summary>
         /// <returns></returns>
-        private static ComposablePartCatalog GetCatalog()
+        private static CompositionContainer GetContainer()
         {
             var dir = new DirectoryCatalog(".").FullPath;
-            var files = Directory.EnumerateFiles(dir, "*.dll", SearchOption.AllDirectories)
-                .Union(Directory.EnumerateFiles(dir, "*.exe", SearchOption.AllDirectories));
+            var files = new HashSet<string>(
+                Directory.EnumerateFiles(dir, "*.dll", SearchOption.AllDirectories)
+                .Union(Directory.EnumerateFiles(dir, "*.exe", SearchOption.AllDirectories))
+                , StringComparer.OrdinalIgnoreCase);
             var logs = new AggregateCatalog();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            foreach (var a in assemblies)
+            {
+                if (a.IsDynamic == false)
+                {
+                    LoadAssembly(a).ForEach(logs.Catalogs.Add);
+                    files.Remove(a.Location);
+                }
+            }
             foreach (var file in files)
             {
                 try
                 {
-                    var asmCat = new AssemblyCatalog(file);
-                    if (asmCat.Parts.ToList().Count > 0)
-                        logs.Catalogs.Add(asmCat);
+                    var ass = Assembly.Load(File.ReadAllBytes(file));
+                    if (ass.IsDynamic == false)
+                    {
+                        LoadAssembly(ass).ForEach(logs.Catalogs.Add);
+                    }
                 }
-                catch (Exception)
-                {
-                }
+                catch { }
             }
-            return logs;
+            return new SelectionPriorityContainer(logs);
+        }
+
+        private static List<ComposablePartCatalog> LoadAssembly(Assembly assembly)
+        {
+            var list = new List<ComposablePartCatalog>();
+            Type[] types;
+            try
+            {
+                types = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                types = ex.Types;
+            }
+            catch (Exception)
+            {
+                return list;
+            }
+            foreach (var type in types)
+            {
+                try
+                {
+                    if (type != null)
+                    {
+                        if (System.Text.RegularExpressions.Regex.IsMatch(type.FullName, "[^a-zA-Z_`0-9.+]"))
+                        {
+                            Console.WriteLine(type.Name);
+                            continue;
+                        }
+                        list.Add(new TypeCatalog(type));
+                    }
+                }
+                catch { }
+            }
+            return list;
         }
 
         /// <summary>
@@ -188,7 +198,8 @@ namespace blqw.ReflectionComponent
                     continue;
                 }
                 var value = GetExportedValue(import);
-                f.SetValue(instance, value);
+                if (value != null)
+                    f.SetValue(instance, value);
             }
             var args = new object[1];
             foreach (var p in type.GetProperties(flags))
@@ -204,8 +215,11 @@ namespace blqw.ReflectionComponent
                     continue;
                 }
                 var value = GetExportedValue(import);
-                args[0] = value;
-                set.Invoke(instance, args);
+                if (value != null)
+                {
+                    args[0] = value;
+                    set.Invoke(instance, args);
+                }
             }
         }
 
@@ -513,6 +527,6 @@ namespace blqw.ReflectionComponent
             }
 
         }
-        
+
     }
 }
