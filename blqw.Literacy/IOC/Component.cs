@@ -2,7 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Runtime.Serialization;
 using blqw.Reflection;
-using blqw.ReflectionComponent;
+using blqw.IOC;
 
 namespace blqw.Reflection
 {
@@ -10,7 +10,7 @@ namespace blqw.Reflection
     {
         public Component()
         {
-            MEFPart.Import(typeof(Component));
+            MEFLite.Import(typeof(Component));
         }
 
         [Import("GetConverter")]

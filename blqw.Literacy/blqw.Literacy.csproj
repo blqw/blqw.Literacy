@@ -52,7 +52,7 @@
     <Compile Include="IOC\ConstructorInfoEx.cs" />
     <Compile Include="IOC\ExportComponent.cs" />
     <Compile Include="IOC\FieldInfoEx.cs" />
-    <Compile Include="IOC\MEFPart.cs" />
+    <Compile Include="IOC\MEFLite.cs" />
     <Compile Include="IOC\MethodInfoEx.cs" />
     <Compile Include="IOC\PropertyInfoEx.cs" />
     <Compile Include="IOC\TypeEx.cs" />
@@ -61,6 +61,11 @@
     <Compile Include="ObjectProperty.cs" />
     <Compile Include="ObjectPropertyCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="blqw.Literacy.nuspec" />
+    <None Include="nuget-pack.bat" />
+    <None Include="update-ioc.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

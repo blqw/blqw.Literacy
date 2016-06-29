@@ -8,24 +8,27 @@
 
 ## 与反射的性能比较  
 
+
 ### 测试1  
-<table>
-<tr><th>测试内容</th><th>循环次数</th><th>运行时间</th><th>CPU时钟周期</th></tr>
-<tr><td> PropertyInfo.GetValue() </td><td> 1000000 </td><td> 204ms </td><td> 467,083,802 </td></tr>
-<tr><td> dynamic </td><td> 1000000 </td><td> 41ms </td><td> 92,844,899 </td></tr>
-<tr><td> Literacy </td><td> 1000000 </td><td> 28ms </td><td> 65,759,428 </td></tr>
-</table>
+|        测试内容         | 循环次数  |运行时间| CPU时钟周期  |
+|:----------------------:|:-------:|:-----:|:----------: |
+|PropertyInfo.GetValue() | 1000000 | 204ms | 467,083,802 |
+|dynamic                 | 1000000 |  41ms | 92,844,899  |
+|Literacy                | 1000000 |  28ms | 65,759,428  |
+
 ### 测试2  
-<table>
-<tr><th>测试内容</th><th>循环次数</th><th>初始化时间</th><th>运行时间</th><th>CPU时钟周期</th></tr>
-<tr><td> Lambda.Compile() </td><td> 1000000 </td><td> 1.7693ms </td><td> 33ms </td><td> 77,217,274 </td></tr>
-<tr><td> CreateDelegate(GetGetMethod()) </td><td> 1000000 </td><td> 1.8108ms </td><td> 29ms </td><td> 66,729,503 </td></tr>
-<tr><td> Literacy </td><td> 1000000 </td><td> 1.6712ms </td><td> 12ms </td><td> 28,517,667 </td></tr>
-</table>
+|        测试内容                | 循环次数  | 初始化时间|运行时间| CPU时钟周期  |
+|:-----------------------------:|:-------:|:--------:|:-----:|:----------: |
+|Lambda.Compile()               | 1000000 | 1.7693ms | 33ms  | 467,083,802 |
+|CreateDelegate(GetGetMethod()) | 1000000 | 1.8108ms | 29ms  | 92,844,899  |
+|Literacy                       | 1000000 | 1.6712ms | 12ms  | 65,759,428  |
 
 #### [性能测试代码](https://github.com/blqw/blqw.Literacy/blob/master/Demo/Program.cs)
 
 ## 更新说明  
+#### 2016.06.30
+* 更新MEF  
+
 #### 2016.04.15
 * 更新MEF  
 
