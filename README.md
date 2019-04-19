@@ -26,6 +26,12 @@
 #### [性能测试代码](https://github.com/blqw/blqw.Literacy/blob/master/Demo/Program.cs)
 
 ## 更新说明  
+#### [3.0.0-beta] 2019.04.19
+- 移植代码到standard
+- 暂时移除 `CreateNewObject` 方法
+- 移除`AttributeCollection`改为使用拓展方法支持, 语法不便
+- 移除MEF, 后续将支持原生DI
+
 #### 2016.06.30
 * 更新MEF  
 
