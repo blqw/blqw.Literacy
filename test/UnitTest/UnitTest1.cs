@@ -298,32 +298,32 @@ namespace UnitTest
                 }
             }
         }
-        //测试初始化引用类型
-        [TestMethod]
-        public void TestCreateClass()
-        {
-            var new1 = Literacy.CreateNewObject(typeof(ClassEntity), null);
-            var obj1 = (ClassEntity)new1();
-            Assert.AreNotEqual(null, obj1);
+        ////测试初始化引用类型
+        //[TestMethod]
+        //public void TestCreateClass()
+        //{
+        //    var new1 = Literacy.CreateNewObject(typeof(ClassEntity), null);
+        //    var obj1 = (ClassEntity)new1();
+        //    Assert.AreNotEqual(null, obj1);
 
-            var new2 = Literacy.CreateNewObject(typeof(ClassEntity), new Type[] { typeof(string), typeof(int) });
-            var obj2 = (ClassEntity)new2("A", 1);
-            Assert.AreEqual("A", obj2.ClassProperty);
-            Assert.AreEqual(1, obj2.StructProperty);
-        }
-        //测试初始化值类型
-        [TestMethod]
-        public void TestCreateStruct()
-        {
-            var new1 = Literacy.CreateNewObject(typeof(StructEntity), null);
-            var obj1 = (StructEntity)new1();
-            Assert.AreNotEqual(null, obj1);
+        //    var new2 = Literacy.CreateNewObject(typeof(ClassEntity), new Type[] { typeof(string), typeof(int) });
+        //    var obj2 = (ClassEntity)new2("A", 1);
+        //    Assert.AreEqual("A", obj2.ClassProperty);
+        //    Assert.AreEqual(1, obj2.StructProperty);
+        //}
+        ////测试初始化值类型
+        //[TestMethod]
+        //public void TestCreateStruct()
+        //{
+        //    var new1 = Literacy.CreateNewObject(typeof(StructEntity), null);
+        //    var obj1 = (StructEntity)new1();
+        //    Assert.AreNotEqual(null, obj1);
 
-            var new2 = Literacy.CreateNewObject(typeof(StructEntity), new Type[] { typeof(string), typeof(int) });
-            var obj2 = (StructEntity)new2("A", 1);
-            Assert.AreEqual("A", obj2.ClassProperty);
-            Assert.AreEqual(1, obj2.StructProperty);
-        }
+        //    var new2 = Literacy.CreateNewObject(typeof(StructEntity), new Type[] { typeof(string), typeof(int) });
+        //    var obj2 = (StructEntity)new2("A", 1);
+        //    Assert.AreEqual("A", obj2.ClassProperty);
+        //    Assert.AreEqual(1, obj2.StructProperty);
+        //}
 
         //测试类型特性
         [TestMethod]
